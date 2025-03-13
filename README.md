@@ -28,3 +28,9 @@ Ordre des choses
 ### Phase 4 - Déploiement
 
 - Validation
+
+## Packet  
+
+| Type | PACKET_ID | SRC | DEST | RETRY_C | PAYLOAD | END |
+| :----: | :----: | :----: | :----: | :----: | :----: | :----: |
+| 4 | 16 | 8 | 8 | 4 | reste | ? |
