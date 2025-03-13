@@ -31,6 +31,6 @@ Ordre des choses
 
 ## Packet  
 
-| Type | PACKET_ID | SRC | DEST | PAYLOAD | END |
-| :----: | :----: | :----: | :----: | :----: | :----: |
-| 4 | 16 | 8 | 8 | reste | ? |
+| Type | PACKET_ID | SRC | DEST | SIZE | PAYLOAD | END |
+| :----: | :----: | :----: | :----: | :----: | :----: | :----: |
+| 4 | 16 | 8 | 8 | 8 | reste | ? |
