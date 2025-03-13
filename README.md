@@ -8,29 +8,56 @@ Ordre des choses
 
 ### Phase 1 - Organisation  
 
-- groupes
-- tâches
-- planification
-- cahier des charges
+- [x] [groupes](#groupes)
+- [ ] [tâches](#tâches)
+- [ ] planification
+- [ ] cahier des charges
 
 ### Phase 2 - Réalisation 1  
 
-- code
-- documentation
-- tester
+- [ ] code
+- [ ] documentation
+- [ ] tester
 
 ### Phase 3 - Réalisation 2  
 
-- mettre ensemble
-- tester
-- corriger
+- [ ] mettre ensemble
+- [ ] tester
+- [ ] corriger
 
 ### Phase 4 - Déploiement
 
-- Validation
+- [ ] Validation
+
+## Groupes  
+
+| N | MEMBRES | [TACHES](#tâches) |
+| :----: | :----: | :----: |
+| 1 | SB & SG | add_recieve recieve |
+| 2 | JG & RG | send |
+| 3 | NK & TY | process recieve |
+| 4 | GK & AS | serial output |
+| 5 | AD & JP | encode decode |
+| 6 | MG & ME | documentation |
+| 7 | AB & MV | if_know add_know_list |
+
+## Tâches  
+
+- [ ] main
+- [ ] serial input
+- [ ] encode
+- [ ] add sent queue
+- [ ] send
+- [ ] recieve
+- [ ] add recieve queue
+- [ ] process recieve
+- [ ] recieve
+- [ ] if know list
+- [ ] add know list
+- [ ] serial output
 
 ## Packet  
 
-| Type | PACKET_ID | SRC | DEST | SIZE | PAYLOAD | END |
-| :----: | :----: | :----: | :----: | :----: | :----: | :----: |
-| 4 | 16 | 8 | 8 | 8 | reste | ? |
+| Type | PACKET_ID | SRC | DEST | SIZE | PAYLOAD |
+| :----: | :----: | :----: | :----: | :----: | :----: |
+| 4 | 16 | 8 | 8 | 8 | size - 38bits |
