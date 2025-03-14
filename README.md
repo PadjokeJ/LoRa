@@ -60,4 +60,6 @@ Ordre des choses
 
 | Type | PACKET_ID | SRC | DEST | SIZE | PAYLOAD |
 | :----: | :----: | :----: | :----: | :----: | :----: |
-| 4 | 16 | 8 | 8 | 8 | size - 38bits |
+| 8 | 16 | 8 | 8 | 8 | size - 38bits |
+
+il n'y a pas de type de variable en c sur 4 bits, du coup le type sera sur 4 bits  
