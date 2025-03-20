@@ -8,7 +8,7 @@ struct packet decode(uint8_t* packet_bytes){
     uint8_t packet_type = packet_bytes[0];
     decoding_packet.type = packet_type;
     
-    uint16_t packet_ID = packet_bytes[1] <<8 + packet_bytes[2];
+    uint16_t packet_ID = (((uint16_t)packet_bytes[1] << 8) & 0xFF00) + ((uint16_t)packet_bytes[2] & 0x00FF);
     decoding_packet.identifier = packet_ID;
 
     uint8_t message_source = packet_bytes[3];

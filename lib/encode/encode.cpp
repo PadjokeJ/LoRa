@@ -33,9 +33,9 @@ struct packet encode(uint8_t packet_type, uint8_t source_address, uint8_t destin
     *ptr_encoded_bytes = encoding_packet.type; // copy the packet type byte to the encoded bytes
     ptr_encoded_bytes++; // move the pointer to packet id
 
-    *ptr_encoded_bytes = (uint8_t)(encoding_packet.identifier >> 8); // copy the packet identifier byte (the first eight bits) to the encoded bytes
+    *ptr_encoded_bytes = (uint8_t)((encoding_packet.identifier & 0xFF00) >> 8); // copy the packet identifier byte (the first eight bits) to the encoded bytes
     ptr_encoded_bytes++; // move the pointer to packet id's second byte
-    *ptr_encoded_bytes = (uint8_t)encoding_packet.identifier; // copy the packet identifier byte (the last eight bits) to the encoded bytes
+    *ptr_encoded_bytes = (uint8_t)(encoding_packet.identifier & 0x00FF); // copy the packet identifier byte (the last eight bits) to the encoded bytes
     ptr_encoded_bytes++; // move the pointer to source
     
     *ptr_encoded_bytes = encoding_packet.source; // copy the packet type byte to the encoded bytes
