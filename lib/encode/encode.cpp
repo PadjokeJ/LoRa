@@ -21,14 +21,14 @@ struct packet encode(uint8_t packet_type, uint8_t source_address, uint8_t destin
 
     struct packet encoding_packet = to_packet_struct(packet_type, identifier, source_address, destination_address, message);
 
-    char* message = encoding_packet.message;
+    char* ptr_message = encoding_packet.message;
     uint8_t message_size = size_of_message(message);
     encoding_packet.size = message_size;
     uint8_t encoded_bytes[message_size];
     uint8_t* ptr_encoded_bytes = encoded_bytes;
     
-    while(*message++){
-        *ptr_encoded_bytes = (uint8_t)*message;
+    while(*ptr_message++){
+        *ptr_encoded_bytes = (uint8_t)*ptr_message;
         ptr_encoded_bytes++;
     }
 
