@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-
-#include "packet.h"
+#include "encode.h"
+#include "../packet/packet.h"
 
 uint8_t size_of_message(char* message){
     uint8_t size;

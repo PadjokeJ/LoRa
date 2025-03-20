@@ -1,6 +1,7 @@
-#include "encode.h"
-#include "packet.h"
+#include "../encode/encode.h"
+#include "../packet/packet.h"
 
+#include <stdio.h>
 #include <stdint.h>
 
 int main(){
