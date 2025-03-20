@@ -1,6 +1,8 @@
 #ifndef PACKET_H
 #define PACKET_H
 
+#include <stdint.h>
+
 struct packet{
     uint8_t type;
     uint16_t identifier;
