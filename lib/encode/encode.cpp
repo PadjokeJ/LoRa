@@ -27,7 +27,7 @@ struct packet encode(uint8_t packet_type, uint8_t source_address, uint8_t destin
     uint8_t message_size = size_of_message(message); // get the message size
     encoding_packet.size = message_size; // set the message size inside the packet structure
 
-    uint8_t encoded_bytes[message_size + 6]; // create an uninitialized array with the correct size to include all the information
+    uint8_t* encoded_bytes{new uint8_t[message_size + 6]}; // create an uninitialized array with the correct size to include all the information
     uint8_t* ptr_encoded_bytes = encoded_bytes; // set a pointer to the start of the encoded array start
     
     *ptr_encoded_bytes = encoding_packet.type; // copy the packet type byte to the encoded bytes
