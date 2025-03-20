@@ -1,3 +1,10 @@
+/*
+*   Run commands : 
+*   g++ .\lib\encode\encode_test.cpp .\lib\encode\encode.cpp .\lib\decode\decode.cpp .\lib\packet\packet.cpp -o app.exe
+*   .\a.exe
+*/
+
+
 #include "../encode/encode.h"
 #include "../packet/packet.h"
 #include "../decode/decode.h"
