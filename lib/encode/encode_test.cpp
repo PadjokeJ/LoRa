@@ -1,5 +1,6 @@
 #include "../encode/encode.h"
 #include "../packet/packet.h"
+#include "../decode/decode.h"
 
 #include <stdio.h>
 #include <stdint.h>
@@ -13,13 +14,23 @@ int main(){
 
     struct packet pack;
 
-    encode(packet_type, source, dest, message);
+    pack = encode(packet_type, source, dest, message);
 
     printf("ID \t:\t%d\n", pack.identifier);
     printf("Type \t:\t%d\n", pack.type);
     printf("source \t:\t%d\n", pack.source);
     printf("dest \t:\t%d\n", pack.destination);
     printf("size \t:\t%d\n", pack.size);
+    printf("message\t:\t%s\n", pack.message);
+
+    pack = decode(pack.encoded_bytes);
+
+    printf("ID \t:\t%d\n", pack.identifier);
+    printf("Type \t:\t%d\n", pack.type);
+    printf("source \t:\t%d\n", pack.source);
+    printf("dest \t:\t%d\n", pack.destination);
+    printf("size \t:\t%d\n", pack.size);
+    printf("message\t:\t%s\n", pack.message);
 
     return 0;
 }
