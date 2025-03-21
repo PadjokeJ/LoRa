@@ -9,9 +9,9 @@ Ordre des choses
 ### Phase 1 - Organisation  
 
 - [x] [groupes](#groupes)
-- [ ] [tâches](#tâches)
-- [ ] planification
-- [ ] cahier des charges
+- [x] [tâches](#tâches)
+- [x] planification
+- [x] cahier des charges
 
 ### Phase 2 - Réalisation 1  
 
