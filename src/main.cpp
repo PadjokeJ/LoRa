@@ -1,3 +1,10 @@
+/*
+*   Compile command:
+*       g++ .\src\main.cpp .\lib\encode\encode.cpp .\lib\decode\decode.cpp .\lib\packet\packet.cpp .\lib\memory\memory.cpp .\lib\process\process.cpp .\lib\recieve\recieve.cpp .\lib\send\send.cpp .\lib\serial\serial.cpp -o app.exe
+*   Run command:
+*       .\app.exe
+*/
+
 #include <Arduino.h>
 
 
