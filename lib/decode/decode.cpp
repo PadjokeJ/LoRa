@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdint.h>
+
 #include "decode.h"
 #include "../packet/packet.h"
 
@@ -32,4 +35,25 @@ struct packet decode(uint8_t* packet_bytes){
         ptr_decoded_bytes++;
     }
     return decoding_packet;
+}
+
+int get_packet_type(struct packet pack){
+    uint8_t packet_type = pack.type;
+    
+    printf("\nPacket id: %d is a ", packet_type);
+
+    switch (packet_type){
+        case 0:
+            printf("network discovery packet\n");
+        case 1:
+            printf("message packet\n");
+            break;
+        case 2:
+            printf("read receipt packet\n");
+            break;
+        default:
+            printf("unrecognized packet\n");
+    }
+
+    return packet_type;
 }
