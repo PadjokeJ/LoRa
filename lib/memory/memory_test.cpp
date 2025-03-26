@@ -19,11 +19,11 @@ int comparaison(int id, int* knownlist,int taille) {  // Déclare la fonction 'c
                 knownlist[i]=0;//Réinitialise la knownlist
             knownlist[0]=id;//Ajoute l'id à la knownlist
             }
-        printf("Liste reset\n");
+        printf("Liste reset\n"); //Superflu
         }
     else{
         *tmp=id;//Ajoute l id a la knownlist
-        printf("added\n");
+        printf("added\n");//Superflu
     }    
     }
     return known;  // Retourne 1 si l'ID a été trouvé (known = 1), sinon retourne 0 (known = 0).
@@ -34,12 +34,11 @@ int main()
     int destinataire =1;
     int id=600;
     int moi=2;
-    int taille =3;
-    int knownlist[3]={0};
+    int taille =4;//taille de la liste known
+    int knownlist[4]={0}; //création de la known liste
     knownlist[0]=700;//Superflu
     knownlist[1]=710;//Superflu
-    knownlist[taille-1]=-1;
-    taille++;//Superflu
+    knownlist[taille-1]=-1;//Definit la fin de la limite
     if (destinataire==moi){
         printf("Message pour vous\n"); //Superflu
         //Ajoutez fonction pour récup message
@@ -56,8 +55,8 @@ int main()
     
     
     
-    for(int i =0;i<(taille-1);i++){
-        printf("%d\n",knownlist[i]);
+    for(int i =0;i<(taille);i++){//Superflu
+        printf("%d\n",knownlist[i]);//Superflu
     }
     return 0;
 }
