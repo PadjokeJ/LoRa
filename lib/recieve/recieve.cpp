@@ -10,10 +10,15 @@
 // LoRa Frequency (change if needed)
 #define RF95_FREQ 868.0  
 
-// Create LoRa object
-RH_RF95 rf95(RFM95_CS, RFM95_INT);
+Receive::Receive(int ssPin, int rstPin, int freq) {
+  _ssPin = ssPin;  // NSS
+  _rstPin = rstPin;  // reset
+  _freq = freq;  // freq
+  rf95 = RH_RF95(ssPin, rstPin);  // Initialize le LoRa module
+}
 
-void setup() {
+
+void Receive::init() {
     Serial.begin(9600);
     while (!Serial);
 
@@ -47,7 +52,7 @@ void setup() {
     rf95.setTxPower(13, false);
 }
 
-void loop() {
+void Receive::receiveMessage() {
     if (rf95.available()) {  // Check if a packet is received
         unsigned char recieved_message[RH_RF95_MAX_MESSAGE_LEN];  // Buffer to store received data
         unsigned char len = sizeof(recieved_message);
