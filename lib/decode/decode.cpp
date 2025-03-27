@@ -29,9 +29,10 @@ struct packet decode(uint8_t* packet_bytes){
     char* ptr_decoded_bytes{new char[message_size]}; // create an array that have the size of the message
     char* decoded_bytes_array_address = ptr_decoded_bytes; // cpoy the adresse of the begining of the array
 
-    while(*ptr_packet_bytes++){ // loop until it is at the end of the array
+    while(*ptr_packet_bytes){ // loop until it is at the end of the array
         *ptr_decoded_bytes = (char)*ptr_packet_bytes; // take the encoded byte and turn it into a character
-        ptr_decoded_bytes++; // go to the next byte
+        ptr_decoded_bytes++; // go to the next byte to write to
+        ptr_packet_bytes++; // go to the next byte to decode
     }
 
     decoding_packet.message = decoded_bytes_array_address; // put the decoded message in the packet structure

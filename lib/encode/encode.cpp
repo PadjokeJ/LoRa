@@ -43,9 +43,10 @@ struct packet encode(uint8_t packet_type, uint16_t identifier, uint8_t source_ad
     ptr_encoded_bytes++; // move the pointer to message start
 
 
-    while(*ptr_message++){
+    while(*ptr_message){
         *ptr_encoded_bytes = (uint8_t)*ptr_message; // transform char to 8bit
         ptr_encoded_bytes++;
+        ptr_message++;
     }
 
 
