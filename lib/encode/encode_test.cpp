@@ -21,7 +21,7 @@ int main(){
 
     struct packet pack;
 
-    pack = encode(packet_type, source, dest, message);
+    pack = encode_message_to_send(source, dest, message);
 
     printf("ID \t:\t%d\n", pack.identifier);
     printf("Type \t:\t%d\n", pack.type);
