@@ -1,8 +1,9 @@
 #include"lorainit.h"
+#include <Arduino.h>
 #include <SPI.h>
 #include <RH_RF95.h>
 
-Receive::Receive(int ssPin, int rstPin, int freq) {
+Lorainit::Lorainit(int ssPin, int rstPin, int freq) {
   _ssPin = ssPin;  // NSS
   _rstPin = rstPin;  // reset
   _freq = freq;  // freq
@@ -10,7 +11,7 @@ Receive::Receive(int ssPin, int rstPin, int freq) {
 }
 
 
-void Receive::init() {
+void Lorainit::init() {
     Serial.begin(9600);
     while (!Serial);
 
@@ -37,9 +38,9 @@ void Receive::init() {
         while (1);
     }
 
-    Serial.print("Listening on frequency: ");
+    Serial.print("LoRa on frequency: ");
     Serial.println(RF95_FREQ);
 
     // Set receiver mode
-    rf95.setTxPower(13, false);
+    rf95.setTxPower(21, false);
 }
