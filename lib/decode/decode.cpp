@@ -45,6 +45,7 @@ int get_packet_type(struct packet pack){
     switch (packet_type){
         case 0:
             printf("network discovery packet\n");
+            break;
         case 1:
             printf("message packet\n");
             break;
