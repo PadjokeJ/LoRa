@@ -7,7 +7,7 @@ int comparaison(int id, int* knownlist,int taille) {  // Déclare la fonction 'c
     int *tmp;
     for (int i = 0; knownlist[i] >0; i++) {  // Parcourt le tableau d'IDs jusqu'à la taille actuelle du tableau.
         if (knownlist[i] == id) {  // Si l'élément actuel du tableau correspond à l'ID cherché.
-            known = 1;  // Met la variable 'tknown' à 1 si l'ID a été trouvé.
+            known = 1;  // Met la variable 'known' à 1 si l'ID a été trouvé.
             break;  // Sort de la boucle immédiatement une fois l'ID trouvé.
         }
         tmp=&knownlist[i];
