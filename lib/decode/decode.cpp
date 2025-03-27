@@ -5,8 +5,8 @@
 #include "../packet/packet.h"
 
 struct packet decode(uint8_t* packet_bytes){
-    struct packet decoding_packet;
-    decoding_packet.encoded_bytes = packet_bytes;
+    struct packet decoding_packet; // declare a packet structure
+    decoding_packet.encoded_bytes = packet_bytes; // take the parameter of the function decode
 
     uint8_t packet_type = packet_bytes[0]; // get the first encoded byte as the packet type
     decoding_packet.type = packet_type; // set the packet type inside the packet structure
@@ -26,15 +26,15 @@ struct packet decode(uint8_t* packet_bytes){
 
     uint8_t* ptr_packet_bytes = &packet_bytes[6]; // put a pointer at the begining of the encoded message
     
-    char* ptr_decoded_bytes{new char[message_size]}; //
-    char* decoded_bytes_array_address = ptr_decoded_bytes;
+    char* ptr_decoded_bytes{new char[message_size]}; // create an array that have the size of the message
+    char* decoded_bytes_array_address = ptr_decoded_bytes; // cpoy the adresse of the begining of the array
 
-    while(*ptr_packet_bytes++){ //
-        *ptr_decoded_bytes = (char)*ptr_packet_bytes; // 
-        ptr_decoded_bytes++; //
+    while(*ptr_packet_bytes++){ // loop until it is at the end of the array
+        *ptr_decoded_bytes = (char)*ptr_packet_bytes; // take the encoded byte and turn it into a character
+        ptr_decoded_bytes++; // go to the next byte
     }
 
-    decoding_packet.message = decoded_bytes_array_address;
+    decoding_packet.message = decoded_bytes_array_address; // put the decoded message in the packet structure
     return decoding_packet;
 }
 
