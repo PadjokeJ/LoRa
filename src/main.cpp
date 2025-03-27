@@ -15,6 +15,12 @@
 #include "../lib/send/send.h"
 #include "../lib/serial/serial.h"
 
+#define RFM95_CS 10  // NSS (Chip Select)
+#define RFM95_RST 9  // Reset Pin
+#define RFM95_INT 2  // DIO0 (Interrupt Pin)
+
+// LoRa Frequency (change if needed)
+#define RF95_FREQ 868.0  
 
 void setup() {
    

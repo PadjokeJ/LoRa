@@ -1,9 +1,6 @@
-#include "recieve.h"
+#include"lorainit.h"
 #include <SPI.h>
 #include <RH_RF95.h>
-
-// Define LoRa module pins
-
 
 Receive::Receive(int ssPin, int rstPin, int freq) {
   _ssPin = ssPin;  // NSS
@@ -45,22 +42,4 @@ void Receive::init() {
 
     // Set receiver mode
     rf95.setTxPower(13, false);
-}
-
-void Receive::receiveMessage() {
-    if (rf95.available()) {  // Check if a packet is received
-        unsigned char recieved_message[RH_RF95_MAX_MESSAGE_LEN];  // Buffer to store received data
-        unsigned char len = sizeof(recieved_message);
-
-        if (rf95.recv(recieved_message, &len)) {  // Receive packet
-            Serial.print("Received message: ");
-            Serial.write(recieved_message, len);  // Print message
-            Serial.println();
-
-            Serial.print("RSSI: ");
-            Serial.println(rf95.lastRssi());  // Print signal strength
-        } else {
-            Serial.println("Receive failed.");
-        }
-    }
 }
