@@ -1,4 +1,5 @@
 #include "memory.h"
+#include <stdint.h>
 
 int comparaison(int id, int* knownlist,int taille) {  // Déclare la fonction 'comparaison' qui prend l'ID du destinataire, l'ID du paquet, un tableau d'IDs, l'ID de l'expéditeur et la taille du tableau.
     int known = 0;  // Déclare et initialise la variable 'known' à 0, qui indiquera si l'ID a été trouvé dans le tableau.
