@@ -21,7 +21,7 @@ int main(){
 
     struct packet pack;
 
-    pack = encode(packet_type, source, dest, message);
+    pack = encode_message_to_send(source, dest, message);
 
     printf("ID \t:\t%d\n", pack.identifier);
     printf("Type \t:\t%d\n", pack.type);
@@ -29,6 +29,14 @@ int main(){
     printf("dest \t:\t%d\n", pack.destination);
     printf("size \t:\t%d\n", pack.size);
     printf("message\t:\t%s\n", pack.message);
+
+    putchar('\n');
+
+    uint8_t* bytess = pack.encoded_bytes;
+    while(*bytess++){
+        printf("%d, ", *bytess);
+    }
+    putchar('\n');
 
     pack = decode(pack.encoded_bytes);
 
