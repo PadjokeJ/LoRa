@@ -14,12 +14,7 @@ uint8_t size_of_message(char* message){
     return size;
 }
 
-struct packet encode(uint8_t packet_type, uint8_t source_address, uint8_t destination_address, char* message){ 
-    srand(time(NULL)); // set the seed of the random number generator
-    int random_number = rand(); // get a random number
-
-    uint16_t identifier = (uint16_t)random_number; //convert the random number to a 16 bit type
-
+struct packet encode(uint8_t packet_type, uint16_t identifier, uint8_t source_address, uint8_t destination_address, char* message){ 
     struct packet encoding_packet = to_packet_struct(packet_type, identifier, source_address, destination_address, message); // convert the packet info to a struct
 
     char* ptr_message = encoding_packet.message; // set a pointer to the start of the message array
@@ -57,4 +52,22 @@ struct packet encode(uint8_t packet_type, uint8_t source_address, uint8_t destin
     encoding_packet.encoded_bytes = encoded_bytes; //set the message bytes inside of the packet structure
 
     return encoding_packet;
+}
+
+struct packet encode_message_reciept(struct packet recieved_packet){
+    uint16_t identifier = recieved_packet.identifier;
+    uint8_t source = recieved_packet.source;
+    uint8_t dest = recieved_packet.destination;
+    char *message = recieved_packet.message;
+
+    return encode(~1, identifier, source, dest, message);
+}
+
+struct packet encode_message_to_send(uint8_t source, uint8_t dest, char* message){
+    srand(time(NULL)); // set the seed of the random number generator
+    int random_number = rand(); // get a random number
+
+    uint16_t identifier = (uint16_t)random_number; //convert the random number to a 16 bit type
+
+    return encode(1, identifier, source, dest, message);
 }

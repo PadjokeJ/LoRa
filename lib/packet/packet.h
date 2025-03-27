@@ -15,4 +15,6 @@ struct packet{
 
 struct packet to_packet_struct(uint8_t packet_type, uint16_t identifier, uint8_t source_address, uint8_t destination_address, char* message);
 
+struct packet create_recieve_packet(uint16_t identifier, uint8_t source, uint8_t dest);
+
 #endif

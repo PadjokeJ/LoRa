@@ -1,4 +1,7 @@
- void sendLoRaMessage(String message) {
+#include<Arduino.h> 
+ 
+ 
+ void sendLoRaMessage(string message) {
   // Début de la transmission
   LoRa.beginPacket();
   
