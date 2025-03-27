@@ -1,6 +1,4 @@
 #include "recieve.h"
-<<<<<<< HEAD
-
 #include <SPI.h>
 #include <RH_RF95.h>
 
@@ -66,5 +64,3 @@ void loop() {
         }
     }
 }
-=======
->>>>>>> fc0548bb260d248b72058f5c015f88d602937a07
