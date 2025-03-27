@@ -30,6 +30,14 @@ int main(){
     printf("size \t:\t%d\n", pack.size);
     printf("message\t:\t%s\n", pack.message);
 
+    putchar('\n');
+
+    uint8_t* bytess = pack.encoded_bytes;
+    while(*bytess++){
+        printf("%d, ", *bytess);
+    }
+    putchar('\n');
+
     pack = decode(pack.encoded_bytes);
 
     printf("ID \t:\t%d\n", pack.identifier);
