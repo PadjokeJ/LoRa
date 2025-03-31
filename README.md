@@ -45,7 +45,8 @@ Ordre des choses
 
 - [ ] main
 - [ ] serial input
-- [ ] encode
+- [x] encode
+- [x] decode
 - [ ] add sent queue
 - [ ] send
 - [ ] recieve
