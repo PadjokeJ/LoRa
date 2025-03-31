@@ -56,12 +56,14 @@ struct packet encode(uint8_t packet_type, uint16_t identifier, uint8_t source_ad
 }
 
 struct packet encode_message_reciept(struct packet recieved_packet){
-    uint16_t identifier = recieved_packet.identifier;
-    uint8_t source = recieved_packet.source;
-    uint8_t dest = recieved_packet.destination;
-    char *message = recieved_packet.message;
+    uint16_t identifier = recieved_packet.identifier; // retrieve the identifier from the packet structure
+    uint8_t source = recieved_packet.source; // retrieve the source address from the packet structure
+    uint8_t dest = recieved_packet.destination; // retrieve the destination address from the packet structure
+    char *message = recieved_packet.message; // retrieve the message array from the packet structure
 
-    return encode(~1, identifier, source, dest, message);
+    uint8_t type = ~1; // since typical message is of type 1, invert the bits to get the read type
+
+    return encode(~1, identifier, source, dest, message); // return a packet for this type (read reciept)
 }
 
 struct packet encode_message_to_send(uint8_t source, uint8_t dest, char* message){
@@ -70,5 +72,5 @@ struct packet encode_message_to_send(uint8_t source, uint8_t dest, char* message
 
     uint16_t identifier = (uint16_t)random_number; //convert the random number to a 16 bit type
 
-    return encode(1, identifier, source, dest, message);
+    return encode(1, identifier, source, dest, message); // return a packet for this type (message)
 }
