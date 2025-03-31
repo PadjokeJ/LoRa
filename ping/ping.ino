@@ -23,7 +23,7 @@ byte myId[2] = {10,10};                           // My adress (do not leave 10.
 byte destId[2] = {0,0};                           // To store destination address
 byte packetId[2];                                 // To store oacket ID
 byte timeStamp[4];                                // To store message time
-char *myName = "UNDEFINED ghost";                 // My Name (for RAR)
+char *myName = "UNDEFINED";                 // My Name (for RAR)
 // Message reception
 byte indatabuf[RH_RF95_MAX_MESSAGE_LEN];          // A buffer to store incoming messages
 
@@ -63,16 +63,10 @@ byte indatabuf[RH_RF95_MAX_MESSAGE_LEN];          // A buffer to store incoming 
 // This store the current HW time in timestamp global 4 bytes array
 void setTimeStamp() {
   unsigned long time = millis();
-#if DEBUG_LEVEL >= 3
-  Serial.print("+++ Elaborating timestamp with : "+(String)time+" +++ ");
-#endif
   timeStamp[3] = (byte) time;       // Lowest byte, pos 0
   timeStamp[2] = (byte)(time >> 8);  // pos 1
   timeStamp[1] = (byte)(time >> 16); // pos 2
   timeStamp[0] = (byte)(time >> 24); // pos 3
-#if DEBUG_LEVEL >= 3
-  Serial.print(" DETAILS : "+(String)timeStamp[0]+"."+(String)timeStamp[1]+"."+(String)timeStamp[2]+"."+(String)timeStamp[3]);
-#endif  
 }
 
 // Get the time from a 4 bytes array and put it down into a returned value
@@ -177,15 +171,15 @@ void parseMessage(byte *buffer, uint8_t len) {
 #endif
   if( (buffer[MSG_POS_DEST_H] == myId[0] ) && (buffer[MSG_POS_DEST_L] == myId[1]) ) { // Check if it's for me
 #if DEBUG_LEVEL >= 2
-        Serial.println("Thats for me alone!");
+        Serial.print(" Thats for me alone! --");
 #endif
   } else if((buffer[MSG_POS_DEST_H] == 0 ) && (buffer[MSG_POS_DEST_L] == 0 ) ) {      // or for everyone (bcast)
 #if DEBUG_LEVEL >= 2
-        Serial.println("Thats for us (bcast)");
+        Serial.println(" Thats for us (bcast) --");
 #endif
   } else {                                                                            // Or not, skip
 #if DEBUG_LEVEL >= 2
-    Serial.println("None of my business ...");
+    Serial.println(" None of my business ...");
 #endif
     return ;
   }
@@ -206,6 +200,7 @@ void parseMessage(byte *buffer, uint8_t len) {
   Serial.print(" // TO : " + (String)buffer[MSG_POS_DEST_H]+"."+(String)buffer[MSG_POS_DEST_L]);
   Serial.print(" // FROM : "+ (String)buffer[MSG_POS_SENDER_H]+"."+(String)buffer[MSG_POS_SENDER_L]);
 #endif
+  unsigned long msgtime = 0;
   switch(type) {
     case PING:                               // Ping message
       timeStamp[0] = buffer[MSG_POS_TIME_1]; // Retrive 4 bytes of timestamp
@@ -215,7 +210,6 @@ void parseMessage(byte *buffer, uint8_t len) {
       packetId[0]  = buffer[MSG_POS_PKTID_H]; // Retrive 2 bytes of pycketId
       packetId[1]  = buffer[MSG_POS_PKTID_L];
 #if DEBUG_LEVEL >= 1
-      unsigned long msgtime = 0;
       msgtime = parseTimeStamp(&buffer[MSG_POS_TIME_1]);
       Serial.println(" ==> Time in msg : ["+(String)msgtime+"]");
 #endif
@@ -228,7 +222,7 @@ void parseMessage(byte *buffer, uint8_t len) {
 #endif
       unsigned long delta = millis() - msgtime;           // And diff to now to get the ping time
 #if DEBUG_LEVEL >= 1
-      Serial.print(" DELTA [ms]: ");Serial.println(delta);
+      Serial.print(" DELTA [ms]: ");Serial.print(delta);
 #endif
       break;
     case RAR:
@@ -254,15 +248,12 @@ void parseMessage(byte *buffer, uint8_t len) {
 
 void setup() {
   Serial.begin(9600);     // Serial setup
-  Serial.println("Starting ping/pong");
-  rf95.setTxPower(TX_POWER);    
-  rf95.setModemConfig(RH_RF95::Bw125Cr45Sf2048);
-  rf95.setFrequency(FREQUENCY);
+//  rf95.setTxPower(TX_POWER);    
+//  rf95.setModemConfig(RH_RF95::Bw125Cr45Sf2048);
+//  rf95.setFrequency(FREQUENCY);
 
   if (!rf95.init())       // Radio init
     Serial.println("init failed");
-   // Defaults after init are ... MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
-   // Need to change to 868.0Mhz in RH_RF95.cpp 
 }
 
 ////// MAIN LOOP //////
@@ -297,11 +288,11 @@ void loop() {
         Serial.println("recv failed");  
       }
     } 
-#if DEBUG_LEVEL >= 2    
     else {  // No new messages but time expired
+#if DEBUG_LEVEL >= 2    
       Serial.println("STOP listening");
-    }
 #endif     
+    }
     nowTime = millis();                 // Update the clock
   }
 }
