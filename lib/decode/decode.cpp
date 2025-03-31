@@ -51,7 +51,7 @@ int get_packet_type(struct packet pack){
         case 1:
             printf("message packet\n");
             break;
-        case 2:
+        case ~1:
             printf("read receipt packet\n");
             break;
         default:
