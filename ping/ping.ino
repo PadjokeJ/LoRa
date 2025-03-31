@@ -44,6 +44,7 @@ byte indatabuf[RH_RF95_MAX_MESSAGE_LEN];          // A buffer to store incoming 
 #define MSG_POS_TIME_2     8
 #define MSG_POS_TIME_3     9
 #define MSG_POS_TIME_4     10
+#define MSG_POS_PDLEN      11
 
 // Some config
 #define PING_INTERVAL 10  // Time intervall for sending a PING, rest of time is listening (and answer)
