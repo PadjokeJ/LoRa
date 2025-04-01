@@ -10,55 +10,21 @@
 // Singleton instance of the radio driver
 #include <SPI.h>.     // Used to communcate with the LoRa board
 #include <RH_RF95.h>  // RadioHead library to drive LoRa radio communications
+#include "config.h"
 
 // Instanciate a new RF95 drive 
 RH_RF95 rf95;
-#define TX_POWER 13.  // From 2 to 20dBm emiter power 
-#define FREQUENCY 868 // Europe is 968
 ///// Some globals
 // Data sending
 byte dataoutgoing[RH_RF95_MAX_MESSAGE_LEN];       // A buffer to prepare an outgoing message
 byte lenMsg = 0;                                  // Length of that message
-byte myId[2] = {10,10};                           // My adress (do not leave 10.10)
 byte destId[2] = {0,0};                           // To store destination address
+const byte broadCast[2] = {0,0};
 byte packetId[2];                                 // To store oacket ID
 byte timeStamp[4];                                // To store message time
-char *myName = "UNDEFINED";                 // My Name (for RAR)
 // Message reception
 byte indatabuf[RH_RF95_MAX_MESSAGE_LEN];          // A buffer to store incoming messages
-
-// MSG TYPE and protocol is of type query - reply
-#define PING  1      // Query for echo
-#define PONG  2      // Answer echo
-#define RAR   3      // Reverse adress research
-#define RARA  4      // Reverse adress research answer
-
-/// This defines the msg format (see doc)
-#define MSG_POS_TYPE       0
-#define MSG_POS_SENDER_H   1
-#define MSG_POS_SENDER_L   2
-#define MSG_POS_DEST_H     3
-#define MSG_POS_DEST_L     4
-#define MSG_POS_PKTID_H    5
-#define MSG_POS_PKTID_L    6
-#define MSG_POS_TIME_1     7
-#define MSG_POS_TIME_2     8
-#define MSG_POS_TIME_3     9
-#define MSG_POS_TIME_4     10
-#define MSG_POS_PDLEN      11
-
-// Some config
-#define PING_INTERVAL 10  // Time intervall for sending a PING, rest of time is listening (and answer)
-#define DEBUG_LEVEL   1   // DEBUG to enable some debugging 
-                          // Level 0 or no debug : programm should run silent
-                          // Level 1 : log the main events like sending and receiving
-                          // Level 2 : some part running
-                          // Level 3 :  some details in function like calculus
-
-// Some tools
-#define MAX(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a > _b ? _a : _b; })
-#define MIN(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a < _b ? _a : _b; })
-#define LOG_TIME Serial.print((String)"["+(String)millis()+(String)"]")
+unsigned long interval = (unsigned long)1000 * PING_INTERVAL;
 
 // This store the current HW time in timestamp global 4 bytes array
 void setTimeStamp() {
@@ -93,12 +59,12 @@ void setPacketId() {
 // and store len of built message into lenMsg. We have used 
 // Overload technique here to have default params python like style
 void buildMessage(byte type) {  // Specify only type
-  byte broadCast[2] = {0,0};    // Default address is set to broadcast
-  buildMessage(type, broadCast);
+  buildMessage(type, &broadCast[0]);
 }
 
 void buildMessage(byte type, byte dest[2]) { // ... and specify address
   setPacketId();        
+  Serial.println("------>"+(String)dest[0]+"."+(String)dest[1]);
   buildMessage(type, dest, NULL); 
 }
 
@@ -155,7 +121,7 @@ void buildMessage(byte type, byte dest[2], char *payload) {
     Serial.print(" // To : "+(String)destId[0]+"."+(String)destId[1]);
   }
 #if DEBUG_LEVEL >= 3
-  Serial.print(" DETAILS2 : "+(String)timeStamp[0]+"."+(String)timeStamp[1]+"."+(String)timeStamp[2]+"."+(String)timeStamp[3]);
+  Serial.print(" TIMESTAMP : "+(String)timeStamp[0]+"."+(String)timeStamp[1]+"."+(String)timeStamp[2]+"."+(String)timeStamp[3]);
 #endif 
   Serial.println(" // AT ["+(String)(unsigned long int)(parseTimeStamp(&timeStamp[0]))+"]");
 #endif // Level 1
@@ -213,7 +179,7 @@ void parseMessage(byte *buffer, uint8_t len) {
       msgtime = parseTimeStamp(&buffer[MSG_POS_TIME_1]);
       Serial.println(" ==> Time in msg : ["+(String)msgtime+"]");
 #endif
-      buildMessage(PONG, destId); 
+      buildMessage(PONG, broadCast); 
       break;     
     case PONG:
       msgtime = parseTimeStamp(&buffer[MSG_POS_TIME_1]);  // Get the timestamp, calculate epoch time
@@ -230,6 +196,11 @@ void parseMessage(byte *buffer, uint8_t len) {
       packetId[1]  = buffer[MSG_POS_PKTID_L];
       buildMessage(RARA, destId, myName); 
       break;
+    case RARA:
+#if DEBUG_LEVEL >= 1
+      // Should display address resolved to ...
+#endif
+      break;
   }
   if((type==PING) || (type=RAR)) {    // We have to send a reply to PING and RAR
 #if DEBUG_LEVEL >= 2
@@ -243,24 +214,40 @@ void parseMessage(byte *buffer, uint8_t len) {
 #endif 
 }
 
+void blinkLed() { // To make it alive
+//  digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
+ // delay(100);                       // wait for 
+ // digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Main Programm with setup() and loop()
-
 void setup() {
-  Serial.begin(9600);     // Serial setup
-//  rf95.setTxPower(TX_POWER);    
-//  rf95.setModemConfig(RH_RF95::Bw125Cr45Sf2048);
-//  rf95.setFrequency(FREQUENCY);
-
-  if (!rf95.init())       // Radio init
+ // pinMode(LED_BUILTIN, OUTPUT);
+#if DEBUG_LEVEL > 0
+  Serial.begin(9600);           // Serial setup
+  delay(500);
+  Serial.println(">>> Starting");
+#endif
+  //rf95.setFrequency(FREQUENCY);                 // No need to
+  rf95.setModemConfig(RH_RF95::MODEM_CONFIG);  // Set low bandwidth and long distance
+  rf95.setTxPower(TX_POWER);                      // Set the ouput power
+  if (!rf95.init()) {            // Radio init
     Serial.println("init failed");
+  }
+#if DEBUG_LEVEL > 0
+  Serial.println("<<<< Started");
+#endif
+//#if DEBUG_LEVEL = 0
+//  Serial.end();
+//#endif
 }
 
 ////// MAIN LOOP //////
 void loop() {
   unsigned long nowTime = millis();
   unsigned long startTime = nowTime;                        // When did we start this loop
-  unsigned long endLoop = startTime + 1000 * PING_INTERVAL; // WHen shall we end that iteration (and go to the next ping)
+  unsigned long endLoop = startTime + interval; // WHen shall we end that iteration (and go to the next ping)
 
   ////////////////////////////////////
   // SENDING OUT A PING
@@ -270,6 +257,7 @@ void loop() {
   buildMessage(PING);                 // Prepare a message in dataoutgoing buffer and length in lenMsg
   rf95.send(dataoutgoing, lenMsg);    // Send it out
   rf95.waitPacketSent();              // Leave the board alone time to send
+  blinkLed();
 
   ////////////////////////////////////
   // Waiting for incoming messages
@@ -284,6 +272,7 @@ void loop() {
         Serial.println(len);
 #endif
         parseMessage(indatabuf, len);     // Read and interpret that incoming message
+        blinkLed();
       } else {
         Serial.println("recv failed");  
       }
