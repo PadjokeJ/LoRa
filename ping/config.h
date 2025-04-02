@@ -2,8 +2,8 @@
 #define _CONFIG_H_
 
 // Some config
-#define PING_INTERVAL 5  // Time intervall in seconds for sending a PING, rest of time is listening (and answer)
-#define DEBUG_LEVEL   3   // DEBUG to enable some debugging 
+#define PING_INTERVAL 10  // Time intervall in seconds for sending a PING, rest of time is listening (and answer)
+#define DEBUG_LEVEL   1   // DEBUG to enable some debugging 
                           // Level 0 or no debug : programm should run silent, not waiting for serial
                           // Level 1 : log the main events like sending and receiving
                           // Level 2 : some part running
@@ -17,7 +17,7 @@
 #define MODEM_CONFIG4 Bw125Cr48Sf4096  // Bw = 125 kHz, Cr = 4/8, Sf = 4096chips/symbol, low data rate, CRC on. Slow+long range.
 #define MODEM_CONFIG5 Bw125Cr45Sf2048  // Bw = 125 kHz, Cr = 4/5, Sf = 2048chips/symbol, CRC on. Slow+long range.
 
-#define MODEM_CONFIG MODEM_CONFIG5
+#define MODEM_CONFIG MODEM_CONFIG4
 
 // Global vars
 byte myId[2] = {10,10};                           // My adress (do not leave 10.10)

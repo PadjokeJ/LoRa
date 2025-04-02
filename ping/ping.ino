@@ -18,8 +18,7 @@ RH_RF95 rf95;
 // Data sending
 byte dataoutgoing[RH_RF95_MAX_MESSAGE_LEN];       // A buffer to prepare an outgoing message
 byte lenMsg = 0;                                  // Length of that message
-byte destId[2] = {0,0};                           // To store destination address
-const byte broadCast[2] = {0,0};
+const byte broadCast[2] = {0,0};                  // Constant value for broadcast
 byte packetId[2];                                 // To store oacket ID
 byte timeStamp[4];                                // To store message time
 // Message reception
@@ -64,7 +63,6 @@ void buildMessage(byte type) {  // Specify only type
 
 void buildMessage(byte type, byte dest[2]) { // ... and specify address
   setPacketId();        
-  Serial.println("------>"+(String)dest[0]+"."+(String)dest[1]);
   buildMessage(type, dest, NULL); 
 }
 
@@ -75,8 +73,8 @@ void buildMessage(byte type, byte dest[2], char *payload) {
   dataoutgoing[MSG_POS_TYPE] = type;
   dataoutgoing[MSG_POS_SENDER_H] = myId[0];
   dataoutgoing[MSG_POS_SENDER_L] = myId[1];  
-  dataoutgoing[MSG_POS_DEST_H] = destId[0];
-  dataoutgoing[MSG_POS_DEST_L] = destId[1];
+  dataoutgoing[MSG_POS_DEST_H] = dest[0];
+  dataoutgoing[MSG_POS_DEST_L] = dest[1];
   
   if((type == PING) || (type == RAR)) {    // If this is not an answer
     setTimeStamp();
@@ -115,10 +113,10 @@ void buildMessage(byte type, byte dest[2], char *payload) {
       Serial.print("Type : RARA");
   }
   Serial.print( " // From : " +(String)myId[0]+"."+(String)myId[1] );
-  if(destId[0] == 0 && destId[1] == 0) {
+  if(dest[0] == 0 && dest[1] == 0) {
     Serial.print(" // To : BROADCAST");
   } else {
-    Serial.print(" // To : "+(String)destId[0]+"."+(String)destId[1]);
+    Serial.print(" // To : "+(String)dest[0]+"."+(String)dest[1]);
   }
 #if DEBUG_LEVEL >= 3
   Serial.print(" TIMESTAMP : "+(String)timeStamp[0]+"."+(String)timeStamp[1]+"."+(String)timeStamp[2]+"."+(String)timeStamp[3]);
@@ -150,6 +148,7 @@ void parseMessage(byte *buffer, uint8_t len) {
     return ;
   }
   // Extract then adresses and packetID
+  byte destId[2];
   destId[0] = buffer[MSG_POS_SENDER_H]; // To reply, sender becomes dest.
   destId[1] = buffer[MSG_POS_SENDER_L];
   packetId[0] = buffer[MSG_POS_PKTID_H]; // To reply, packetId is same
@@ -179,7 +178,7 @@ void parseMessage(byte *buffer, uint8_t len) {
       msgtime = parseTimeStamp(&buffer[MSG_POS_TIME_1]);
       Serial.println(" ==> Time in msg : ["+(String)msgtime+"]");
 #endif
-      buildMessage(PONG, broadCast); 
+      buildMessage(PONG, destId); 
       break;     
     case PONG:
       msgtime = parseTimeStamp(&buffer[MSG_POS_TIME_1]);  // Get the timestamp, calculate epoch time
@@ -202,7 +201,7 @@ void parseMessage(byte *buffer, uint8_t len) {
 #endif
       break;
   }
-  if((type==PING) || (type=RAR)) {    // We have to send a reply to PING and RAR
+  if((type==PING) || (type==RAR)) {    // We have to send a reply to PING and RAR
 #if DEBUG_LEVEL >= 2
     Serial.print(" --> Sending reply...");
 #endif
@@ -214,33 +213,23 @@ void parseMessage(byte *buffer, uint8_t len) {
 #endif 
 }
 
-void blinkLed() { // To make it alive
-//  digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
- // delay(100);                       // wait for 
- // digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Main Programm with setup() and loop()
 void setup() {
- // pinMode(LED_BUILTIN, OUTPUT);
-#if DEBUG_LEVEL > 0
-  Serial.begin(9600);           // Serial setup
+  Serial.begin(9600);           // Serial setup (Required to have RH booting)
   delay(500);
   Serial.println(">>> Starting");
-#endif
-  //rf95.setFrequency(FREQUENCY);                 // No need to
-  rf95.setModemConfig(RH_RF95::MODEM_CONFIG);  // Set low bandwidth and long distance
-  rf95.setTxPower(TX_POWER);                      // Set the ouput power
-  if (!rf95.init()) {            // Radio init
+  //rf95.setFrequency(FREQUENCY);              // No need to
+  rf95.setModemConfig(RH_RF95::MODEM_CONFIG);  // According to config
+  rf95.setTxPower(TX_POWER);                   // Set the output power
+  if (!rf95.init()) {                          // Radio init
     Serial.println("init failed");
   }
-#if DEBUG_LEVEL > 0
   Serial.println("<<<< Started");
+#if DEBUG_LEVEL == 0
+  Serial.println("Now you can unplug the serial !");
+  Serial.end();
 #endif
-//#if DEBUG_LEVEL = 0
-//  Serial.end();
-//#endif
 }
 
 ////// MAIN LOOP //////
@@ -257,7 +246,6 @@ void loop() {
   buildMessage(PING);                 // Prepare a message in dataoutgoing buffer and length in lenMsg
   rf95.send(dataoutgoing, lenMsg);    // Send it out
   rf95.waitPacketSent();              // Leave the board alone time to send
-  blinkLed();
 
   ////////////////////////////////////
   // Waiting for incoming messages
@@ -272,7 +260,6 @@ void loop() {
         Serial.println(len);
 #endif
         parseMessage(indatabuf, len);     // Read and interpret that incoming message
-        blinkLed();
       } else {
         Serial.println("recv failed");  
       }
