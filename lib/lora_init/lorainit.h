@@ -7,14 +7,14 @@
 
 class Lorainit {
   public:
-    Lorainit(int ssPin, int rstPin, int freq);
-    void init();
+    Lorainit(int ssPin, int freq);
+    void init();  // Instance publique pour Romain et Sacha
+    RH_RF95& lora();
 
   private:
-    RH_RF95 rf95;
     int _ssPin;
-    int _rstPin;
     int _freq;
+    RH_RF95 rf95;
 };
 
 #endif
