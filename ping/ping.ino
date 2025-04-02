@@ -213,10 +213,33 @@ void parseMessage(byte *buffer, uint8_t len) {
 #endif 
 }
 
+void blinkSend() {
+  digitalWrite(LED_SEND, HIGH);
+  delay(50);
+  digitalWrite(LED_SEND, LOW);
+}
+
+void blinkRecv() {
+  digitalWrite(LED_RECV, HIGH);
+  delay(50);
+  digitalWrite(LED_RECV, LOW);
+}
+
+void progressBlink() {
+  blinkSend();
+  delay(100);
+  blinkRecv();
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Main Programm with setup() and loop()
 void setup() {
+  // First of all, low level comm
+  pinMode(LED_SEND, OUTPUT);
+  pinMode(LED_RECV, OUTPUT);
+  progressBlink();
   Serial.begin(9600);           // Serial setup (Required to have RH booting)
+  progressBlink();
   delay(500);
   Serial.println(">>> Starting");
   //rf95.setFrequency(FREQUENCY);              // No need to

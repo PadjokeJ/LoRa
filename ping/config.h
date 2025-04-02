@@ -11,6 +11,11 @@
 #define TX_POWER 20  // From 2 to 20dBm emiter power 
 #define FREQUENCY 868 // Europe is 868
 
+// Some definition below ... not to be twisted
+// Leds for debugging
+#define LED_SEND 7
+#define LED_RECV 8
+
 #define MODEM_CONFIG1 Bw125Cr45Sf128   // Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Default medium range.
 #define MODEM_CONFIG2 Bw500Cr45Sf128   // Bw = 500 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Fast+short range.
 #define MODEM_CONFIG3 Bw31_25Cr48Sf512 // Bw = 31.25 kHz, Cr = 4/8, Sf = 512chips/symbol, CRC on. Slow+long range.
