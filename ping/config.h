@@ -51,6 +51,46 @@ char *myName = "MARCELIN33";                 // My Name (for RAR)
 #define MIN(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a < _b ? _a : _b; })
 #define LOG_TIME Serial.print((String)"["+(String)millis()+(String)"]")
 
+// === LOGGING MACROS ===
+#if DEBUG_LEVEL > 0
+  #define INIT_SERIAL() do { Serial.begin(9600); while (!Serial) { delay(10); } } while(0);
+#else
+  #define INIT_SERIAL()  // rien
+#endif
+
+#if DEBUG_LEVEL >= 1
+  #define LOG1(x)     Serial.print(x)
+  #define LOGLN1(x)   Serial.println(x)
+#else
+  #define LOG1(x)     // rien
+  #define LOGLN1(x)   // rien
+#endif
+
+#if DEBUG_LEVEL >= 2
+  #define LOG2(x)     Serial.print(x)
+  #define LOGLN2(x)   Serial.println(x)
+#else
+  #define LOG2(x)     // rien
+  #define LOGLN2(x)   // rien
+#endif
+
+#if DEBUG_LEVEL >= 3
+  #define LOG3(x)     Serial.print(x)
+  #define LOGLN3(x)   Serial.println(x)
+#else
+  #define LOG3(x)     // rien
+  #define LOGLN3(x)   // rien
+#endif
+
+// Log horodaté (sécurisé dans les blocs conditionnels)
+#if DEBUG_LEVEL >= 1
+  #define LOG_TIME() Serial.print("["+(String)millis()+"] ");
+#else
+   #define LOG_TIME() 
+#endif
+
+
+
 #endif // _CONFIG_H_
 
 

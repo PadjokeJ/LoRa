@@ -97,7 +97,7 @@ void buildMessage(byte type, byte dest[2], char *payload) {
     lenMsg = 12 + len;
   }
 #if DEBUG_LEVEL >= 1
-  LOG_TIME;
+  LOG_TIME();
   Serial.print(" SENDING -- ");
   switch (type) {
     case PING:
@@ -130,7 +130,7 @@ void buildMessage(byte type, byte dest[2], char *payload) {
 void parseMessage(byte *buffer, uint8_t len) {
   byte type = buffer[MSG_POS_TYPE];       // First extract message type
 #if DEBUG_LEVEL >= 1
-  LOG_TIME;
+  LOG_TIME();
   Serial.print(" RECEIVING -- ");
 #endif
   if( (buffer[MSG_POS_DEST_H] == myId[0] ) && (buffer[MSG_POS_DEST_L] == myId[1]) ) { // Check if it's for me
@@ -238,7 +238,8 @@ void setup() {
   pinMode(LED_SEND, OUTPUT);
   pinMode(LED_RECV, OUTPUT);
   progressBlink();
-  Serial.begin(9600);           // Serial setup (Required to have RH booting)
+  INIT_SERIAL()
+  // Serial.begin(9600);           // Serial setup (Required to have RH booting)
   progressBlink();
   delay(500);
   Serial.println(">>> Starting");
