@@ -20,13 +20,13 @@
 #define RFM95_RST 9
 #define RFM95_INT 2
 
-#define MODEM_CONFIG1 Bw125Cr45Sf128   // Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Default medium range.
-#define MODEM_CONFIG2 Bw500Cr45Sf128   // Bw = 500 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Fast+short range.
-#define MODEM_CONFIG3 Bw31_25Cr48Sf512 // Bw = 31.25 kHz, Cr = 4/8, Sf = 512chips/symbol, CRC on. Slow+long range.
-#define MODEM_CONFIG4 Bw125Cr48Sf4096  // Bw = 125 kHz, Cr = 4/8, Sf = 4096chips/symbol, low data rate, CRC on. Slow+long range.
-#define MODEM_CONFIG5 Bw125Cr45Sf2048  // Bw = 125 kHz, Cr = 4/5, Sf = 2048chips/symbol, CRC on. Slow+long range.
-
-#define MODEM_CONFIG MODEM_CONFIG4
+#define MODEM_CONFIG1 RH_RF95::Bw125Cr45Sf128   // Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Default medium range.
+#define MODEM_CONFIG2 RH_RF95::Bw500Cr45Sf128   // Bw = 500 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Fast+short range.
+#define MODEM_CONFIG3 RH_RF95::Bw31_25Cr48Sf512 // Bw = 31.25 kHz, Cr = 4/8, Sf = 512chips/symbol, CRC on. Slow+long range.
+#define MODEM_CONFIG4 RH_RF95::Bw125Cr48Sf4096  // Bw = 125 kHz, Cr = 4/8, Sf = 4096chips/symbol, low data rate, CRC on. Slow+long range.
+#define MODEM_CONFIG5 RH_RF95::Bw125Cr45Sf2048  // Bw = 125 kHz, Cr = 4/5, Sf = 2048chips/symbol, CRC on. Slow+long range.
+#define MODEM_CONFIG6 RH_RF95::Bw31_25Cr48Sf512
+#define MODEM_CONFIG MODEM_CONFIG6
 
 // Global vars
 byte myId[2] = {10,10};                           // My adress (do not leave 10.10)
@@ -53,7 +53,6 @@ char *myName = "MARCELIN33";                 // My Name (for RAR)
 // Some tools
 #define MAX(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a > _b ? _a : _b; })
 #define MIN(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a < _b ? _a : _b; })
-#define LOG_TIME Serial.print((String)"["+(String)millis()+(String)"]")
 
 // === LOGGING MACROS ===
 #if DEBUG_LEVEL > 0
@@ -89,11 +88,11 @@ char *myName = "MARCELIN33";                 // My Name (for RAR)
 
 // Log horodaté (sécurisé dans les blocs conditionnels)
 #if DEBUG_LEVEL >= 1
-  #define LOG_TIME() Serial.print("["+(String)millis()+"] ");
+  #define LOG_TIME() do { Serial.print("["); Serial.print(millis()); Serial.print("] "); } while(0) // Les compact but less memory usage
+//  #define LOG_TIME() Serial.print("["+(String)millis()+"] ");
 #else
    #define LOG_TIME() 
 #endif
-
 
 
 #endif // _CONFIG_H_

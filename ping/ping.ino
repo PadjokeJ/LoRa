@@ -54,6 +54,42 @@ void setPacketId() {
   packetId[1] = (byte)random(255);  
 }
 
+void logHeaderInfo(byte* buf) {
+#if DEBUG_LEVEL >= 1
+  switch (buf[MSG_POS_TYPE]) {
+    case PING:
+      LOG1(" <<Type : PING>> ");
+      break;
+    case PONG:
+      LOG1(" <<Type : PONG>> ");
+      break;
+    case RAR:
+      LOG1(" <<Type : RAR>> ");
+      break;
+    case RARA:
+      LOG1(" <<Type : RARA>> ");
+      break;
+    default:
+      LOG1(" <<Type : UNKNOWN>> ");
+    break;
+  }
+  LOG1("<<FROM : "); LOG1((String)buf[MSG_POS_SENDER_H]+"."+String(buf[MSG_POS_SENDER_L]));
+  LOG1(" // TO : "); LOG1((String)buf[MSG_POS_DEST_H]+"."+String(buf[MSG_POS_DEST_L])); LOG1(">>");
+#endif
+}
+
+void logFrame(byte* buf, int len) {
+#if DEBUG_LEVEL >= 3
+  LOG3("Trame HEX : ");
+  for (int i = 0; i < len; i++) {
+    if (buf[i] < 16) Serial.print("0");
+    Serial.print(buf[i], HEX);
+    Serial.print(" ");
+  }
+  Serial.println();
+#endif
+}
+
 ////////////////////////////////////////////////////////////////
 // buildMessage build a message stored into dataoutgoing buffer
 // and store len of built message into lenMsg. We have used 
@@ -92,104 +128,57 @@ void buildMessage(byte type, byte dest[2], char *payload) {
     lenMsg = 12;                            // End of header of 12 bytes
   } else {
     byte len = MIN(strlen(payload), 200);
-    dataoutgoing[11] = 'len';               // End of header
-    char *str = &dataoutgoing[12];          // Enventually add a payload
+    dataoutgoing[11] = len;               // End of header
+    char *str = &dataoutgoing[12];          // Eventually add a payload
     strncpy(str, payload, len);
     lenMsg = 12 + len;
   }
-#if DEBUG_LEVEL >= 1
-  LOG_TIME();
-  Serial.print(" SENDING -- ");
-  switch (type) {
-    case PING:
-      Serial.print("Type : PING");
-      break;
-    case PONG:
-      Serial.print("Type : PONG");
-      break;
-    case RAR:
-      Serial.print("Type : RAR");
-      break;
-    case RARA:
-      Serial.print("Type : RARA");
-  }
-  Serial.print( " // From : " +(String)myId[0]+"."+(String)myId[1] );
-  if(dest[0] == 0 && dest[1] == 0) {
-    Serial.print(" // To : BROADCAST");
-  } else {
-    Serial.print(" // To : "+(String)dest[0]+"."+(String)dest[1]);
-  }
-#if DEBUG_LEVEL >= 3
-  Serial.print(" TIMESTAMP : "+(String)timeStamp[0]+"."+(String)timeStamp[1]+"."+(String)timeStamp[2]+"."+(String)timeStamp[3]);
-#endif 
-  Serial.println(" // AT ["+(String)(unsigned long int)(parseTimeStamp(&timeStamp[0]))+"]");
-#endif // Level 1
-}
+// Some debug display next
+logHeaderInfo(dataoutgoing);
+LOGLN1("");
+} // End of build message
 
 ////////////////////////////////////////////////////////////////
-// parseMessage is to paarse incoming message
+// parseMessage is to parse incoming message
 void parseMessage(byte *buffer, uint8_t len) {
   byte type = buffer[MSG_POS_TYPE];       // First extract message type
-#if DEBUG_LEVEL >= 1
   LOG_TIME();
-  Serial.print(" RECEIVING -- ");
-#endif
+  LOG1(" RECEIVING -- ");
+
   if( (buffer[MSG_POS_DEST_H] == myId[0] ) && (buffer[MSG_POS_DEST_L] == myId[1]) ) { // Check if it's for me
-#if DEBUG_LEVEL >= 2
-        Serial.print(" Thats for me alone! --");
-#endif
+    LOG2(" -- Thats for me alone! -- ");
   } else if((buffer[MSG_POS_DEST_H] == 0 ) && (buffer[MSG_POS_DEST_L] == 0 ) ) {      // or for everyone (bcast)
-#if DEBUG_LEVEL >= 2
-        Serial.println(" Thats for us (bcast) --");
-#endif
-  } else {                                                                            // Or not, skip
-#if DEBUG_LEVEL >= 2
-    Serial.println(" None of my business ...");
-#endif
+    LOG2(" -- Thats for us (bcast) -- ");
+  } else {     
+    LOG2(" -- None of my business -- ");                                                                       // Or not, skip
     return ;
   }
-  // Extract then adresses and packetID
+  // Extract then addresses and packetID
   byte destId[2];
   destId[0] = buffer[MSG_POS_SENDER_H]; // To reply, sender becomes dest.
   destId[1] = buffer[MSG_POS_SENDER_L];
   packetId[0] = buffer[MSG_POS_PKTID_H]; // To reply, packetId is same
-  packetId[0] = buffer[MSG_POS_PKTID_L];
-#if DEBUG_LEVEL >= 1
-  switch(type) {
-    case PING:
-      Serial.print("Type : PING");
-      break;     
-    case PONG:
-      Serial.print("Type : PONG");
-      break;
-  }
-  Serial.print(" // TO : " + (String)buffer[MSG_POS_DEST_H]+"."+(String)buffer[MSG_POS_DEST_L]);
-  Serial.print(" // FROM : "+ (String)buffer[MSG_POS_SENDER_H]+"."+(String)buffer[MSG_POS_SENDER_L]);
-#endif
-  unsigned long msgtime = 0;
+  packetId[1] = buffer[MSG_POS_PKTID_L];
+  
+  logHeaderInfo(buffer);
+  unsigned long msgTime = 0;
   switch(type) {
     case PING:                               // Ping message
       timeStamp[0] = buffer[MSG_POS_TIME_1]; // Retrive 4 bytes of timestamp
       timeStamp[1] = buffer[MSG_POS_TIME_2];
       timeStamp[2] = buffer[MSG_POS_TIME_3];
       timeStamp[3] = buffer[MSG_POS_TIME_4];
-      packetId[0]  = buffer[MSG_POS_PKTID_H]; // Retrive 2 bytes of pycketId
+      packetId[0]  = buffer[MSG_POS_PKTID_H]; // Retrive 2 bytes of packetId
       packetId[1]  = buffer[MSG_POS_PKTID_L];
-#if DEBUG_LEVEL >= 1
-      msgtime = parseTimeStamp(&buffer[MSG_POS_TIME_1]);
-      Serial.println(" ==> Time in msg : ["+(String)msgtime+"]");
-#endif
+      msgTime = parseTimeStamp(&buffer[MSG_POS_TIME_1]);  // Get the timestamp, calculate epoch time
+      LOGLN1(" ==> Time in msg : ["+(String)msgTime+"]");
       buildMessage(PONG, destId); 
       break;     
     case PONG:
-      msgtime = parseTimeStamp(&buffer[MSG_POS_TIME_1]);  // Get the timestamp, calculate epoch time
-#if DEBUG_LEVEL >= 1
-      Serial.print(" ==> Time in msg : ");Serial.print(msgtime); 
-#endif
-      unsigned long delta = millis() - msgtime;           // And diff to now to get the ping time
-#if DEBUG_LEVEL >= 1
-      Serial.print(" DELTA [ms]: ");Serial.print(delta);
-#endif
+      msgTime = parseTimeStamp(&buffer[MSG_POS_TIME_1]);  // Get the timestamp, calculate epoch time
+      LOG1(" ==> Time in msg : ["+(String)msgTime+"]");
+      unsigned long delta = millis() - msgTime;           // And diff to now to get the ping time
+      LOG1("DELTA [ms]: "); LOG1(delta);
       break;
     case RAR:
       packetId[0]  = buffer[MSG_POS_PKTID_H]; // Retrive 2 bytes of pycketId
@@ -203,15 +192,12 @@ void parseMessage(byte *buffer, uint8_t len) {
       break;
   }
   if((type==PING) || (type==RAR)) {    // We have to send a reply to PING and RAR
-#if DEBUG_LEVEL >= 2
-    Serial.print(" --> Sending reply...");
-#endif
-    rf95.send(dataoutgoing, sizeof(dataoutgoing));
+    LOG2(" --> Should send a reply ");
+    blinkSend();                        // We blink before to avoir delay after sent and be ready for reception ASAP
+    rf95.send(dataoutgoing, lenMsg);
     rf95.waitPacketSent();
   } 
-#if DEBUG_LEVEL >= 1
-  Serial.println(" ");
-#endif 
+  LOGLN1("");
 }
 
 void resetShield() {
@@ -262,9 +248,11 @@ void setup() {
     }
   }
   progressBlink();
-  //rf95.setFrequency(FREQUENCY);              // No need to
-  rf95.setModemConfig(RH_RF95::MODEM_CONFIG);  // According to config
+  rf95.setFrequency(FREQUENCY);              
+  LOG1("Frequency set to: "); LOG1(FREQUENCY); LOGLN1(" MHz");
+  rf95.setModemConfig(MODEM_CONFIG);  // According to config
   rf95.setTxPower(TX_POWER);                   // Set the output power
+  LOG1("Power set to: "); LOG1(TX_POWER); LOGLN1(" MHz");
   progressBlink();
   // End of setup : both leds UP for 500ms
   Serial.println("<<<< Started");
@@ -299,16 +287,15 @@ void loop() {
     if (rf95.waitAvailableTimeout(endLoop - nowTime)) { // Wait for next message and at max remaining of PING_INTERVAL  
       if (rf95.recv(indatabuf, &len)) {     // Incoming message transfert to data buffer
         blinkRecv();
-        LOG2("Got message of length : "+(String)len)
+        LOG2("Got message of length : "); LOGLN2(len);
         parseMessage(indatabuf, len);     // Read and interpret that incoming message
+        logFrame(indatabuf,len);          // Log details at level 3
       } else {
-        Serial.println("recv failed");  
+        LOGLN1("ERR - Received failed");
       }
     } 
-    else {  // No new messages but time expired
-#if DEBUG_LEVEL >= 2    
-      Serial.println("STOP listening");
-#endif     
+    else {  // No new messages but time expired  
+      LOGLN2("STOP listening for next ping");  
     }
     nowTime = millis();                 // Update the clock
   }
