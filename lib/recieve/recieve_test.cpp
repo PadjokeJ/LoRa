@@ -1,40 +1,69 @@
-#include "recieve.h"
-/*
-  Simple Queue
-  Simple queue demonstration
-  
-  LIFO / FIFO implementations can be tested by changing IMPLEMENTATION
-
-  This example code is in the public domain.
-
-  created 22 March 2017
-  modified 04 November 2020
-  by SMFSW
- */
-
+#include <SPI.h>
+#include <RH_RF95.h>
 #include <cppQueue.h>
 
-#define	IMPLEMENTATION	LIFO
+// Define LoRa module pins
+#define RFM95_CS 10
+#define RFM95_RST 9
+#define RFM95_INT 2
+
+// LoRa Frequency
+#define RF95_FREQ 868.0  
+
+// Create LoRa object
+RH_RF95 rf95(RFM95_CS, RFM95_INT);
+
+// QUEUE MANAGEMENT
+#define MAX_MESSAGE_SIZE 100  // Reduced message size
+#define QUEUE_SIZE 5        // Reduced queue size
+
+// Queue to store messages as raw byte arrays
+cppQueue messageQueue(QUEUE_SIZE, MAX_MESSAGE_SIZE, LIFO);  // Queue of integers
+cppQueue lengthQueue(sizeof(unsigned char), QUEUE_SIZE, LIFO);  
 
 
-typedef struct strRec {
-	uint16_t	entry1;
-	uint16_t	entry2;
-} Rec;
-
-byte buffer[100] = {1,2,3};
-
-
-cppQueue	q(300);	// Instantiate queue
-
-// the setup function runs once when you press reset or power the board
 void setup() {
-	Serial.begin(115200);
-  q.push(buffer);
-  Serial.println(q.pop(buffer));
+    Serial.begin(9600);
+    while (!Serial);
+
+    // Reset the LoRa module
+    pinMode(RFM95_RST, OUTPUT);
+    digitalWrite(RFM95_RST, HIGH);
+    delay(10);
+    digitalWrite(RFM95_RST, LOW);
+    delay(10);
+    digitalWrite(RFM95_RST, HIGH);
+    delay(10);
+
+    if (!rf95.init()) {
+        Serial.println("LoRa module initialization failed!");
+        while (1);
+    }
+
+    if (!rf95.setFrequency(RF95_FREQ)) {
+        Serial.println("Failed to set frequency.");
+        while (1);
+    }
+
+    Serial.println("LoRa module initialized.");
+
 }
 
-// the loop function runs over and over again forever
 void loop() {
-	
+  //sendtest();
+    recieve();
+    // Process messages from the queue
+    if (!messageQueue.isEmpty() && !lengthQueue.isEmpty()) {
+        unsigned char messageLength;
+        byte dequeuedMessage[MAX_MESSAGE_SIZE];
+
+        lengthQueue.pop(&messageLength);  // Pop message length
+        messageQueue.pop(dequeuedMessage);  // Pop actual message
+
+        Serial.print("Dequeued Message: ");
+        Serial.write(dequeuedMessage, messageLength);
+        Serial.println();
+    }
+
+    delay(100);  // Small delay to control loop speed
 }
