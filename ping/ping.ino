@@ -13,7 +13,8 @@
 #include "config.h"
 
 // Instanciate a new RF95 drive 
-RH_RF95 rf95;
+RH_RF95 rf95(RFM95_CS, RFM95_INT);
+//RH_RF95 rf95;
 ///// Some globals
 // Data sending
 byte dataoutgoing[RH_RF95_MAX_MESSAGE_LEN];       // A buffer to prepare an outgoing message
@@ -213,6 +214,17 @@ void parseMessage(byte *buffer, uint8_t len) {
 #endif 
 }
 
+void resetShield() {
+  // Reset LoRa module (facultatif, mais souvent utile)
+  pinMode(RFM95_RST, OUTPUT);
+  digitalWrite(RFM95_RST, HIGH);
+  delay(10);
+  digitalWrite(RFM95_RST, LOW);
+  delay(10);
+  digitalWrite(RFM95_RST, HIGH);
+  delay(10);
+}
+
 void blinkSend() {
   digitalWrite(LED_SEND, HIGH);
   delay(50);
@@ -234,26 +246,34 @@ void progressBlink() {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Main Programm with setup() and loop()
 void setup() {
-  // First of all, low level comm
-  pinMode(LED_SEND, OUTPUT);
+  pinMode(LED_SEND, OUTPUT);      // First of all, low level comm
   pinMode(LED_RECV, OUTPUT);
   progressBlink();
-  INIT_SERIAL()
-  // Serial.begin(9600);           // Serial setup (Required to have RH booting)
+  INIT_SERIAL();                  // Second level logging through serial (if level > 0)
   progressBlink();
-  delay(500);
-  Serial.println(">>> Starting");
+  delay(100);                     // Security delay
+  progressBlink();
+  resetShield();                  // Reset lora shield to avoid Serial depedency
+  Serial.println(">>> Starting"); 
+  if (!rf95.init()) {                 // Radio init
+    Serial.println("init failed");    // Not LOG, since there is not level for that
+    while(true) {                     // Endless blinking loop if radio didn't init
+      blinkRecv();
+    }
+  }
+  progressBlink();
   //rf95.setFrequency(FREQUENCY);              // No need to
   rf95.setModemConfig(RH_RF95::MODEM_CONFIG);  // According to config
   rf95.setTxPower(TX_POWER);                   // Set the output power
-  if (!rf95.init()) {                          // Radio init
-    Serial.println("init failed");
-  }
+  progressBlink();
+  // End of setup : both leds UP for 500ms
   Serial.println("<<<< Started");
-#if DEBUG_LEVEL == 0
-  Serial.println("Now you can unplug the serial !");
-  Serial.end();
-#endif
+  digitalWrite(LED_RECV, HIGH);
+  digitalWrite(LED_SEND, HIGH);
+  delay(500);
+  digitalWrite(LED_RECV, LOW);
+  digitalWrite(LED_SEND, LOW);
+  delay(500);                       // To make it clear from other following blinkings
 }
 
 ////// MAIN LOOP //////
@@ -264,25 +284,22 @@ void loop() {
 
   ////////////////////////////////////
   // SENDING OUT A PING
-#if DEBUG_LEVEL >=2
-  Serial.println("Sending PING in the air");
-#endif
+  LOG2("Sending PING in the air");
   buildMessage(PING);                 // Prepare a message in dataoutgoing buffer and length in lenMsg
+  blinkSend();                        // We blink before to avoir delay after sent and be ready for reception ASAP
   rf95.send(dataoutgoing, lenMsg);    // Send it out
   rf95.waitPacketSent();              // Leave the board alone time to send
 
   ////////////////////////////////////
   // Waiting for incoming messages
   // Time calculation and control
-  uint8_t len = sizeof(indatabuf);    // THis where we are going to collect lenght of incoming messages
+  uint8_t len = sizeof(indatabuf);          // THis where we are going to collect lenght of incoming messages
   // Receiving loop
-  while (nowTime < endLoop) {         // As long as we have not reached end loop time
+  while (nowTime < endLoop) {               // As long as we have not reached end loop time
     if (rf95.waitAvailableTimeout(endLoop - nowTime)) { // Wait for next message and at max remaining of PING_INTERVAL  
-      if (rf95.recv(indatabuf, &len)) {   // Incoming message transfert to data buffer
-#if DEBUG_LEVEL >= 2
-        Serial.print("Got message of length : ");
-        Serial.println(len);
-#endif
+      if (rf95.recv(indatabuf, &len)) {     // Incoming message transfert to data buffer
+        blinkRecv();
+        LOG2("Got message of length : "+(String)len)
         parseMessage(indatabuf, len);     // Read and interpret that incoming message
       } else {
         Serial.println("recv failed");  

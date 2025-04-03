@@ -2,7 +2,7 @@
 #define _CONFIG_H_
 
 // Some config
-#define PING_INTERVAL 10  // Time intervall in seconds for sending a PING, rest of time is listening (and answer)
+#define PING_INTERVAL 5  // Time intervall in seconds for sending a PING, rest of time is listening (and answer)
 #define DEBUG_LEVEL   1   // DEBUG to enable some debugging 
                           // Level 0 or no debug : programm should run silent, not waiting for serial
                           // Level 1 : log the main events like sending and receiving
@@ -14,7 +14,11 @@
 // Some definition below ... not to be twisted
 // Leds for debugging
 #define LED_SEND 7
-#define LED_RECV 8
+#define LED_RECV 3
+
+#define RFM95_CS 10
+#define RFM95_RST 9
+#define RFM95_INT 2
 
 #define MODEM_CONFIG1 Bw125Cr45Sf128   // Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Default medium range.
 #define MODEM_CONFIG2 Bw500Cr45Sf128   // Bw = 500 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Fast+short range.
@@ -53,7 +57,8 @@ char *myName = "MARCELIN33";                 // My Name (for RAR)
 
 // === LOGGING MACROS ===
 #if DEBUG_LEVEL > 0
-  #define INIT_SERIAL() do { Serial.begin(9600); while (!Serial) { delay(10); } } while(0);
+//  #define INIT_SERIAL() Serial.begin(9600)
+  #define INIT_SERIAL() do { Serial.begin(9600); while (!Serial) { delay(10); } } while(0)
 #else
   #define INIT_SERIAL()  // rien
 #endif
