@@ -1,21 +1,19 @@
-#ifndef RECIEVE_H
-#define RECIEVE_H
+#ifndef RECEIVE_H
+#define RECEIVE_H
 
 #include <Arduino.h>
-#include <SPI.h>
 #include <RH_RF95.h>
+#include "lorainit.h"
 
 class Receive {
   public:
-    Receive(int ssPin, int rstPin, int freq);
-    void init();
+    Receive(Lorainit &loraModule);
+    void startReceive();
     void receiveMessage();
 
   private:
-    RH_RF95 rf95;
-    int _ssPin;
-    int _rstPin;
-    int _freq;
+   Lorainit &lora; // Reference to the Lorainit object
+  
 };
 
 #endif
