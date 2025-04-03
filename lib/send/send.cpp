@@ -1,22 +1,54 @@
-#include "send.h"
+#include <SPI.h>
+#include <LoRa.h>  // Bibliothèque LoRa
 
-Send::Send(Lorainit &loraModule) : lora(loraModule) {}
+#define MAX_QUEUE_SIZE 10  // Taille max de la file d'attente
 
-void Send::startSend() {
-    lora.lora.setTxPower(21, false); // Set transmit power (in dBm)
-    lora.lora.setModeTx(); // Set mode to transmit
-    Serial.println("Ready to send");
-}
+char* sendQueue[MAX_QUEUE_SIZE]; // Tableau pour stocker les messages
+int rear = 0; // Position du dernier élément dans la file d'attente
 
-void Send::sendPackets() {                       
 
-/* -----------------------Là Romain et Jules vous mettez votre code qui a à l'interieur du loop-------------------------------------------*/
 
-    Serial.println("Sending: MessageToutCool-OC-INFO");
 
-    uint8_t message[] = "MessageToutCool-OC-INFO";
-    lora.lora.send(message, sizeof(message));
 
-    lora.lora.waitPacketSent();
 
 }
+
+void AddSentQueue(char* message) {
+    sendQueue[rear] = message; // Ajoute le message à l'arrière de la file
+    rear++; // Incrémente l'indice rear pour la prochaine insertion
+}
+
+
+
+
+
+
+void Send() {
+    if (rear == 0) { // Vérifie si la file est vide
+        Serial.println("Aucun message à envoyer.");
+        return;
+    }
+
+    Serial.print("message envoyé : "); // Ajoute paquet ici !!!!
+    Serial.println(sendQueue[0]); // Affiche le message envoyé dans le moniteur série
+
+    // Envoi du message avec LoRa (doc)
+    LoRa.beginPacket();   // Démarre un paquet LoRa
+    LoRa.print(sendQueue[0]); // Ajoute le message au paquet
+    LoRa.endPacket();     // Envoie le paquet
+
+    // replace les autres messages
+    for (int i = 0; i < rear - 1; i++) {
+        sendQueue[i] = sendQueue[i + 1];
+    }
+
+    rear--; // Réduit la taille de la file d'attente après l'envoi
+}
+
+
+void loop() {
+    AddSentQueue("Message"); 
+
+    Send(); 
+    
+   
