@@ -23,30 +23,9 @@ void setup() {
     digitalWrite(RFM95_RST, HIGH);
     delay(10);
 
-<<<<<<< HEAD
-
-
-}
-
-void AddSentQueue(char* message) {
-    sendQueue[rear] = message; // Ajoute le message à l'arrière de la file
-    rear++; // Incrémente l'indice rear pour la prochaine insertion
-}
-
-
-
-
-
-
-void Send() {
-    if (rear == 0) { // Vérifie si la file est vide
-        Serial.println("Aucun message à envoyer.");
-        return;
-=======
     if (!rf95.init()) {
         Serial.println("LoRa module initialization failed!");
         while (1);
->>>>>>> 59231e6785cd22a80a290e0b50aa9a628b509ea9
     }
 
     Serial.println("LoRa module initialized.");
@@ -66,15 +45,10 @@ void loop() {
     Serial.println("Sending: MessageToutCool-OC-INFO");
     uint8_t message[] = "MessageToutCool-OC-INFO";
 
-<<<<<<< HEAD
-    Send(); 
-    
-=======
     rf95.send(message, sizeof(message));
     rf95.waitPacketSent();
 
     Serial.println("Message Sent!");
 
     delay(1000);  // Send every second
->>>>>>> 59231e6785cd22a80a290e0b50aa9a628b509ea9
 }
