@@ -11,7 +11,7 @@ int rear = 0; // Position du dernier élément dans la file d'attente
 
 
 
-}
+
 
 void AddSentQueue(char* message) {
     sendQueue[rear] = message; // Ajoute le message à l'arrière de la file
@@ -51,4 +51,4 @@ void loop() {
 
     Send(); 
     
-   
+}
