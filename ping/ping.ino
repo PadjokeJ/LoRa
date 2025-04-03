@@ -107,6 +107,8 @@ void buildMessage(byte type, byte dest[2]) { // ... and specify address
 // This is the real one with all the code
 void buildMessage(byte type, byte dest[2], char *payload) {
   // Build the header either from params or stored in globals
+  LOG_TIME();
+  LOG1(" SENDING -- ");
   dataoutgoing[MSG_POS_TYPE] = type;
   dataoutgoing[MSG_POS_SENDER_H] = myId[0];
   dataoutgoing[MSG_POS_SENDER_L] = myId[1];  
