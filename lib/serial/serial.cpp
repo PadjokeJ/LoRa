@@ -1,35 +1,33 @@
 #include <SPI.h>
 #include <LoRa.h>
 
-const long frequency = 915E6; // Match the transmitter's frequency
+const long frequency = 915E6; // Fréquence LoRa (doit correspondre à l'émetteur)
+
+void serialOutput(String message) {
+  Serial.print("Received Data: ");
+  Serial.println(message);
+}
 
 void setup() {
   Serial.begin(9600);
-  while (!Serial); // Wait for Serial Monitor to open
+  while (!Serial);
 
-  Serial.println("LoRa Receiver with Optimized Settings");
-
+  Serial.println("LoRa Receiver Initializing...");
+  
   if (!LoRa.begin(frequency)) {
     Serial.println("Starting LoRa failed!");
     while (1);
   }
-  
-  // Apply the same configuration as the transmitter:
-  LoRa.setSpreadingFactor(12);
-  LoRa.setSignalBandwidth(125E3);
-  LoRa.setCodingRate4(5);
-  
+
   Serial.println("LoRa Receiver Ready");
 }
 
 void loop() {
   int packetSize = LoRa.parsePacket();
   if (packetSize) {
-    String received = "";
+    String receivedMessage = "";
     while (LoRa.available()) {
-      received += (char)LoRa.read();
+      receivedMessage += (char)LoRa.read();
     }
-    Serial.print("Received packet: ");
-    Serial.println(received);
+    serialOutput(receivedMessage);
   }
-}
