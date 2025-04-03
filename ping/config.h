@@ -2,7 +2,7 @@
 #define _CONFIG_H_
 
 // Some config
-#define PING_INTERVAL 5  // Time intervall in seconds for sending a PING, rest of time is listening (and answer)
+#define PING_INTERVAL 60  // Time intervall in seconds for sending a PING, rest of time is listening (and answer)
 #define DEBUG_LEVEL   1   // DEBUG to enable some debugging 
                           // Level 0 or no debug : programm should run silent, not waiting for serial
                           // Level 1 : log the main events like sending and receiving
@@ -10,6 +10,9 @@
                           // Level 3 :  some details in function like calculus
 #define TX_POWER 20  // From 2 to 20dBm emiter power 
 #define FREQUENCY 868 // Europe is 868
+byte myId[2] = {10,10};                           // My adress (do not leave 10.10)
+char *myName = "UNKNOWN";                 // My Name (for RAR)
+
 
 // Some definition below ... not to be twisted
 // Leds for debugging
@@ -27,10 +30,6 @@
 #define MODEM_CONFIG5 RH_RF95::Bw125Cr45Sf2048  // Bw = 125 kHz, Cr = 4/5, Sf = 2048chips/symbol, CRC on. Slow+long range.
 #define MODEM_CONFIG6 RH_RF95::Bw31_25Cr48Sf512
 #define MODEM_CONFIG MODEM_CONFIG6
-
-// Global vars
-byte myId[2] = {10,10};                           // My adress (do not leave 10.10)
-char *myName = "MARCELIN33";                 // My Name (for RAR)
 
 // MSG TYPE and protocol is of type query - reply
 #define PING  1      // Query for echo
