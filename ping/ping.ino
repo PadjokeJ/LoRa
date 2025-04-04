@@ -4,16 +4,20 @@
  * Packets have ID to identify them
  * Adresses are made of two bytes 
  * More information about the protocole below here
+ * Compatible with DRAGINO or M5STACK (SX1276 or SX126x)
  * 
  * Philippe.Rochat'at'eduvaud.ch
 **/
 // Singleton instance of the radio driver
 #include <SPI.h>.     // Used to communcate with the LoRa board
-#include <RH_RF95.h>  // RadioHead library to drive LoRa radio communications
 #include "config.h"
+#include LORA_HEADER  // Defined in config.h
 
 // Instanciate a new RF95 drive 
-RH_RF95 rf95(RFM95_CS, RFM95_INT);
+// Instantiate the appropriate LoRa driver
+LORA_DRIVER rf95(RFM95_CS, RFM95_INT);
+//RH_RF95 rf95(RFM95_CS, RFM95_INT);
+
 //RH_RF95 rf95;
 ///// Some globals
 // Data sending

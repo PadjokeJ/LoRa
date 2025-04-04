@@ -10,19 +10,44 @@
                           // Level 3 :  some details in function like calculus
 #define TX_POWER 20  // From 2 to 20dBm emiter power 
 #define FREQUENCY 868 // Europe is 868
-byte myId[2] = {10,10};                           // My adress (do not leave 10.10)
+byte myId[2] = {10,69};                           // My adress (do not leave 10.10)
 char *myName = "UNKNOWN";                 // My Name (for RAR)
 
+// === SELECT HARDWARE PLATFORM ===
+//#define DRAGINO_SHIELD
+#define DRAGINO_DEV
+//#define M5STACK
+
+// === HARDWARE-SPECIFIC SETTINGS ===
+#ifdef DRAGINO_SHIELD
+  #define LED_SEND 7              // Leds for debugging
+  #define LED_RECV 3
+  #define RFM95_CS   10
+  #define RFM95_RST  9
+  #define RFM95_INT  2
+  #define LORA_DRIVER RH_RF95
+  #define LORA_HEADER "RH_RF95.h"
+#endif
+
+#ifdef DRAGINO_DEV
+  #define LED_SEND 5              // Leds for debugging
+  #define LED_RECV 4
+  #define RFM95_CS 10
+  #define RFM95_RST 9
+  #define RFM95_INT 2
+  #define LORA_DRIVER RH_RF95
+  #define LORA_HEADER "RH_RF95.h"
+#endif
+
+#ifdef M5STACK
+  #define RFM95_CS   5
+  #define RFM95_RST  14
+  #define RFM95_INT  26
+  #define LORA_DRIVER RH_SX126x
+  #define LORA_HEADER "RH_SX126x.h"
+#endif
 
 // Some definition below ... not to be twisted
-// Leds for debugging
-#define LED_SEND 7
-#define LED_RECV 3
-
-#define RFM95_CS 10
-#define RFM95_RST 9
-#define RFM95_INT 2
-
 #define MODEM_CONFIG1 RH_RF95::Bw125Cr45Sf128   // Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Default medium range.
 #define MODEM_CONFIG2 RH_RF95::Bw500Cr45Sf128   // Bw = 500 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Fast+short range.
 #define MODEM_CONFIG3 RH_RF95::Bw31_25Cr48Sf512 // Bw = 31.25 kHz, Cr = 4/8, Sf = 512chips/symbol, CRC on. Slow+long range.
@@ -105,4 +130,3 @@ char *myName = "UNKNOWN";                 // My Name (for RAR)
 
  	
 
- 	
