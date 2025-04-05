@@ -13,6 +13,16 @@ Additional configuration (frequency, power, modem settings, logging) is also ava
 
 ---
 
+### 🧩 Platform selection
+
+Edit `config.h` to choose the target board:
+
+```c
+//#define DRAGINO_SHIELD
+#define DRAGINO_DEV
+//#define M5STACK
+
+
 ## 🛠 Requirements
 
 - Arduino Uno (or compatible board)

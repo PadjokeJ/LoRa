@@ -9,25 +9,32 @@
  * Philippe.Rochat'at'eduvaud.ch
 **/
 // Singleton instance of the radio driver
-#include <SPI.h>.     // Used to communcate with the LoRa board
+#include <SPI.h>     // Used to communcate with the LoRa board
 #include "config.h"
+
 #include LORA_HEADER  // Defined in config.h
 
 // Instanciate a new RF95 drive 
 // Instantiate the appropriate LoRa driver
-LORA_DRIVER rf95(RFM95_CS, RFM95_INT);
+//LORA_DRIVER rf95(RFM95_CS, RFM95_INT);
+#ifdef M5STACK
+RH_SX126x loraDriver(RFM95_CS, RFM95_DIO1, RFM95_RST, RFM95_BUSY);
+#else
+LORA_DRIVER loraDriver(RFM95_CS, RFM95_INT);
+#endif
+
 //RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 //RH_RF95 rf95;
 ///// Some globals
 // Data sending
-byte dataoutgoing[RH_RF95_MAX_MESSAGE_LEN];       // A buffer to prepare an outgoing message
+byte dataoutgoing[RH_MAX_MESSAGE_LEN];       // A buffer to prepare an outgoing message
 byte lenMsg = 0;                                  // Length of that message
 const byte broadCast[2] = {0,0};                  // Constant value for broadcast
 byte packetId[2];                                 // To store oacket ID
 byte timeStamp[4];                                // To store message time
 // Message reception
-byte indatabuf[RH_RF95_MAX_MESSAGE_LEN];          // A buffer to store incoming messages
+byte indatabuf[RH_MAX_MESSAGE_LEN];          // A buffer to store incoming messages
 unsigned long interval = (unsigned long)1000 * PING_INTERVAL;
 
 // This store the current HW time in timestamp global 4 bytes array
@@ -102,14 +109,14 @@ void buildMessage(byte type) {  // Specify only type
   buildMessage(type, &broadCast[0]);
 }
 
-void buildMessage(byte type, byte dest[2]) { // ... and specify address
+void buildMessage(byte type, const byte dest[2]) { // ... and specify address
   setPacketId();        
   buildMessage(type, dest, NULL); 
 }
 
 // And specify a payload.
 // This is the real one with all the code
-void buildMessage(byte type, byte dest[2], char *payload) {
+void buildMessage(byte type, const byte dest[2], char *payload) {
   // Build the header either from params or stored in globals
   LOG_TIME();
   LOG1(" SENDING -- ");
@@ -135,7 +142,7 @@ void buildMessage(byte type, byte dest[2], char *payload) {
   } else {
     byte len = MIN(strlen(payload), 200);
     dataoutgoing[11] = len;               // End of header
-    char *str = &dataoutgoing[12];          // Eventually add a payload
+    char *str = (char*)&dataoutgoing[12];          // Eventually add a payload
     strncpy(str, payload, len);
     lenMsg = 12 + len;
   }
@@ -180,12 +187,13 @@ void parseMessage(byte *buffer, uint8_t len) {
       LOGLN1(" ==> Time in msg : ["+(String)msgTime+"]");
       buildMessage(PONG, destId); 
       break;     
-    case PONG:
+    case PONG: {
       msgTime = parseTimeStamp(&buffer[MSG_POS_TIME_1]);  // Get the timestamp, calculate epoch time
       LOG1(" ==> Time in msg : ["+(String)msgTime+"]");
       unsigned long delta = millis() - msgTime;           // And diff to now to get the ping time
       LOG1("DELTA [ms]: "); LOG1(delta);
       break;
+    }
     case RAR:
       packetId[0]  = buffer[MSG_POS_PKTID_H]; // Retrive 2 bytes of pycketId
       packetId[1]  = buffer[MSG_POS_PKTID_L];
@@ -200,8 +208,8 @@ void parseMessage(byte *buffer, uint8_t len) {
   if((type==PING) || (type==RAR)) {    // We have to send a reply to PING and RAR
     LOG2(" --> Should send a reply ");
     blinkSend();                        // We blink before to avoir delay after sent and be ready for reception ASAP
-    rf95.send(dataoutgoing, lenMsg);
-    rf95.waitPacketSent();
+    loraDriver.send(dataoutgoing, lenMsg);
+    loraDriver.waitPacketSent();
   } 
   LOGLN1("");
 }
@@ -218,15 +226,19 @@ void resetShield() {
 }
 
 void blinkSend() {
+#ifndef M5STACK
   digitalWrite(LED_SEND, HIGH);
   delay(50);
   digitalWrite(LED_SEND, LOW);
+#endif
 }
 
 void blinkRecv() {
+#ifndef M5STACK
   digitalWrite(LED_RECV, HIGH);
   delay(50);
   digitalWrite(LED_RECV, LOW);
+#endif
 }
 
 void progressBlink() {
@@ -238,36 +250,57 @@ void progressBlink() {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Main Programm with setup() and loop()
 void setup() {
+#ifndef M5STACK
   pinMode(LED_SEND, OUTPUT);      // First of all, low level comm
   pinMode(LED_RECV, OUTPUT);
+#endif
   progressBlink();
   INIT_SERIAL();                  // Second level logging through serial (if level > 0)
   progressBlink();
   delay(100);                     // Security delay
+#ifdef M5STACK
+  auto cfg = M5.config();
+  M5.begin(cfg);
+  delay(100);
+  M5.Display.setTextSize(2);  // Pour plus de lisibilité
+  M5.Display.setCursor(0, 0);
+  M5.Display.clear();         // Efface l’écran au démarrage
+  M5.Display.print("Booting...");
+#endif
   progressBlink();
+#ifdef M5STACK
+  M5.Display.print("+");
+  SPI.begin(18, 19, 23);          // SCK, MISO, MOSI pour ESP32
+  M5.Display.print("+");
+#endif
   resetShield();                  // Reset lora shield to avoid Serial depedency
-  Serial.println(">>> Starting"); 
-  if (!rf95.init()) {                 // Radio init
+  LOG1(">>> Starting"); 
+  if (!loraDriver.init()) {                 // Radio init
+    LOGLN1("LORA INITIALISATION FAILED !!!");
     Serial.println("init failed");    // Not LOG, since there is not level for that
     while(true) {                     // Endless blinking loop if radio didn't init
       blinkRecv();
     }
   }
+  LOGLN1("*");
   progressBlink();
-  rf95.setFrequency(FREQUENCY);              
+  loraDriver.setFrequency(FREQUENCY);              
   LOG1("Frequency set to: "); LOG1(FREQUENCY); LOGLN1(" MHz");
-  rf95.setModemConfig(MODEM_CONFIG);  // According to config
-  rf95.setTxPower(TX_POWER);                   // Set the output power
+  loraDriver.setModemConfig(MODEM_CONFIG);
+
+  loraDriver.setTxPower(TX_POWER);                   // Set the output power
   LOG1("Power set to: "); LOG1(TX_POWER); LOGLN1(" MHz");
   progressBlink();
   // End of setup : both leds UP for 500ms
   Serial.println("<<<< Started");
+  #ifndef M5STACK
   digitalWrite(LED_RECV, HIGH);
   digitalWrite(LED_SEND, HIGH);
   delay(500);
   digitalWrite(LED_RECV, LOW);
   digitalWrite(LED_SEND, LOW);
   delay(500);                       // To make it clear from other following blinkings
+  #endif
 }
 
 ////// MAIN LOOP //////
@@ -281,8 +314,8 @@ void loop() {
   LOG2("Sending PING in the air");
   buildMessage(PING);                 // Prepare a message in dataoutgoing buffer and length in lenMsg
   blinkSend();                        // We blink before to avoir delay after sent and be ready for reception ASAP
-  rf95.send(dataoutgoing, lenMsg);    // Send it out
-  rf95.waitPacketSent();              // Leave the board alone time to send
+  loraDriver.send(dataoutgoing, lenMsg);    // Send it out
+  loraDriver.waitPacketSent();              // Leave the board alone time to send
 
   ////////////////////////////////////
   // Waiting for incoming messages
@@ -290,8 +323,8 @@ void loop() {
   uint8_t len = sizeof(indatabuf);          // THis where we are going to collect lenght of incoming messages
   // Receiving loop
   while (nowTime < endLoop) {               // As long as we have not reached end loop time
-    if (rf95.waitAvailableTimeout(endLoop - nowTime)) { // Wait for next message and at max remaining of PING_INTERVAL  
-      if (rf95.recv(indatabuf, &len)) {     // Incoming message transfert to data buffer
+    if (loraDriver.waitAvailableTimeout(endLoop - nowTime)) { // Wait for next message and at max remaining of PING_INTERVAL  
+      if (loraDriver.recv(indatabuf, &len)) {     // Incoming message transfert to data buffer
         blinkRecv();
         LOG2("Got message of length : "); LOGLN2(len);
         parseMessage(indatabuf, len);     // Read and interpret that incoming message

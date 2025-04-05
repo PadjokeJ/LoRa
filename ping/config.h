@@ -15,10 +15,30 @@ char *myName = "UNKNOWN";                 // My Name (for RAR)
 
 // === SELECT HARDWARE PLATFORM ===
 //#define DRAGINO_SHIELD
-#define DRAGINO_DEV
-//#define M5STACK
+//#define DRAGINO_DEV
+#define M5STACK
+
+
+#ifdef M5STACK
+  #include <M5Unified.h>
+  #define USE_M5_LCD
+#else
+  #include <SPI.h>
+#endif
 
 // === HARDWARE-SPECIFIC SETTINGS ===
+#ifdef DRAGINO_SHIELD
+  #define RH_MAX_MESSAGE_LEN RH_RF95_MAX_MESSAGE_LEN
+#endif
+
+#ifdef DRAGINO_DEV
+  #define RH_MAX_MESSAGE_LEN RH_RF95_MAX_MESSAGE_LEN
+#endif
+
+#ifdef M5STACK
+  #define RH_MAX_MESSAGE_LEN RH_SX126x_MAX_MESSAGE_LEN
+#endif
+
 #ifdef DRAGINO_SHIELD
   #define LED_SEND 7              // Leds for debugging
   #define LED_RECV 3
@@ -40,20 +60,40 @@ char *myName = "UNKNOWN";                 // My Name (for RAR)
 #endif
 
 #ifdef M5STACK
-  #define RFM95_CS   5
-  #define RFM95_RST  14
-  #define RFM95_INT  26
+  #define RFM95_CS      5
+  #define RFM95_RST     13
+  #define RFM95_BUSY    33
+  #define RFM95_DIO1    35
   #define LORA_DRIVER RH_SX126x
   #define LORA_HEADER "RH_SX126x.h"
 #endif
 
 // Some definition below ... not to be twisted
-#define MODEM_CONFIG1 RH_RF95::Bw125Cr45Sf128   // Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Default medium range.
-#define MODEM_CONFIG2 RH_RF95::Bw500Cr45Sf128   // Bw = 500 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Fast+short range.
-#define MODEM_CONFIG3 RH_RF95::Bw31_25Cr48Sf512 // Bw = 31.25 kHz, Cr = 4/8, Sf = 512chips/symbol, CRC on. Slow+long range.
-#define MODEM_CONFIG4 RH_RF95::Bw125Cr48Sf4096  // Bw = 125 kHz, Cr = 4/8, Sf = 4096chips/symbol, low data rate, CRC on. Slow+long range.
-#define MODEM_CONFIG5 RH_RF95::Bw125Cr45Sf2048  // Bw = 125 kHz, Cr = 4/5, Sf = 2048chips/symbol, CRC on. Slow+long range.
-#define MODEM_CONFIG6 RH_RF95::Bw31_25Cr48Sf512
+
+// === MODEM CONFIGURATION ===
+// These macros define LoRa modulation parameters like bandwidth, spreading factor, and coding rate.
+// They are defined per platform (RF95 vs SX126x) because the enums differ.
+
+// --- M5STACK: SX126x driver ---
+#ifdef M5STACK
+  // Choix valides pour RH_SX126x
+  #define MODEM_CONFIG1 RH_SX126x::LoRa_Bw125Cr45Sf128    // Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Default medium range.
+  #define MODEM_CONFIG2 RH_SX126x::LoRa_Bw500Cr45Sf128    // Bw = 500 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. Fast+short range.
+  #define MODEM_CONFIG3 RH_SX126x::LoRa_Bw31_25Cr48Sf512  // Bw = 31.25 kHz, Cr = 4/8, Sf = 512chips/symbol, CRC on. Slow+long range.
+  #define MODEM_CONFIG4 RH_SX126x::LoRa_Bw125Cr48Sf4096   // Bw = 125 kHz, Cr = 4/8, Sf = 4096chips/symbol, low data rate, CRC on. Slow+long range.
+  #define MODEM_CONFIG5 RH_SX126x::LoRa_Bw125Cr45Sf2048   // Bw = 125 kHz, Cr = 4/5, Sf = 2048chips/symbol, CRC on. Slow+long range.
+  #define MODEM_CONFIG6 MODEM_CONFIG3  // celui qui vise "long range"
+#else
+// --- DRAGINO / UNO: RH_RF95 driver ---
+  #define MODEM_CONFIG1 RH_RF95::Bw125Cr45Sf128
+  #define MODEM_CONFIG2 RH_RF95::Bw500Cr45Sf128
+  #define MODEM_CONFIG3 RH_RF95::Bw31_25Cr48Sf512
+  #define MODEM_CONFIG4 RH_RF95::Bw125Cr48Sf4096
+  #define MODEM_CONFIG5 RH_RF95::Bw125Cr45Sf2048
+  #define MODEM_CONFIG6 RH_RF95::Bw31_25Cr48Sf512
+#endif
+
+// Set the active configuration here (default: long range)
 #define MODEM_CONFIG MODEM_CONFIG6
 
 // MSG TYPE and protocol is of type query - reply
@@ -79,6 +119,13 @@ char *myName = "UNKNOWN";                 // My Name (for RAR)
 #define MIN(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a < _b ? _a : _b; })
 
 // === LOGGING MACROS ===
+#ifdef M5STACK
+  #define LOG_DEVICE M5.Display
+#else
+  #define LOG_DEVICE Serial
+#endif
+
+
 #if DEBUG_LEVEL > 0
 //  #define INIT_SERIAL() Serial.begin(9600)
   #define INIT_SERIAL() do { Serial.begin(9600); while (!Serial) { delay(10); } } while(0)
@@ -87,36 +134,36 @@ char *myName = "UNKNOWN";                 // My Name (for RAR)
 #endif
 
 #if DEBUG_LEVEL >= 1
-  #define LOG1(x)     Serial.print(x)
-  #define LOGLN1(x)   Serial.println(x)
+  #define LOG1(x)     LOG_DEVICE.print(x)
+  #define LOGLN1(x)   LOG_DEVICE.println(x)
 #else
-  #define LOG1(x)     // rien
-  #define LOGLN1(x)   // rien
+  #define LOG1(x)
+  #define LOGLN1(x)
 #endif
 
 #if DEBUG_LEVEL >= 2
-  #define LOG2(x)     Serial.print(x)
-  #define LOGLN2(x)   Serial.println(x)
+  #define LOG2(x)     LOG_DEVICE.print(x)
+  #define LOGLN2(x)   LOG_DEVICE.println(x)
 #else
-  #define LOG2(x)     // rien
-  #define LOGLN2(x)   // rien
+  #define LOG2(x)
+  #define LOGLN2(x)
 #endif
 
 #if DEBUG_LEVEL >= 3
-  #define LOG3(x)     Serial.print(x)
-  #define LOGLN3(x)   Serial.println(x)
+  #define LOG3(x)     LOG_DEVICE.print(x)
+  #define LOGLN3(x)   LOG_DEVICE.println(x)
 #else
-  #define LOG3(x)     // rien
-  #define LOGLN3(x)   // rien
+  #define LOG3(x)
+  #define LOGLN3(x)
 #endif
 
 // Log horodaté (sécurisé dans les blocs conditionnels)
 #if DEBUG_LEVEL >= 1
-  #define LOG_TIME() do { Serial.print("["); Serial.print(millis()); Serial.print("] "); } while(0) // Les compact but less memory usage
-//  #define LOG_TIME() Serial.print("["+(String)millis()+"] ");
+  #define LOG_TIME() do { LOG_DEVICE.print("["); LOG_DEVICE.print(millis()); LOG_DEVICE.print("] "); } while(0)
 #else
-   #define LOG_TIME() 
+  #define LOG_TIME()
 #endif
+
 
 
 #endif // _CONFIG_H_
