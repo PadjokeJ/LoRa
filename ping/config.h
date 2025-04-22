@@ -14,9 +14,9 @@ byte myId[2] = {10,69};                           // My adress (do not leave 10.
 char *myName = "UNKNOWN";                 // My Name (for RAR)
 
 // === SELECT HARDWARE PLATFORM ===
-//#define DRAGINO_SHIELD
+#define DRAGINO_SHIELD
 //#define DRAGINO_DEV
-#define M5STACK
+//#define M5STACK
 
 
 #ifdef M5STACK
