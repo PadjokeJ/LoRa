@@ -187,15 +187,14 @@ void parseMessage(byte *buffer, uint8_t len) {
       LOGLN1(" ==> Time in msg : ["+(String)msgTime+"]");
       buildMessage(PONG, destId); 
       break;     
-    case PONG: {
+    case PONG: 
       msgTime = parseTimeStamp(&buffer[MSG_POS_TIME_1]);  // Get the timestamp, calculate epoch time
       LOG1(" ==> Time in msg : ["+(String)msgTime+"]");
       unsigned long delta = millis() - msgTime;           // And diff to now to get the ping time
       LOG1("DELTA [ms]: "); LOG1(delta);
       break;
-    }
     case RAR:
-      packetId[0]  = buffer[MSG_POS_PKTID_H]; // Retrive 2 bytes of pycketId
+      packetId[0]  = buffer[MSG_POS_PKTID_H]; // Retrive 2 bytes of packetId
       packetId[1]  = buffer[MSG_POS_PKTID_L];
       buildMessage(RARA, destId, myName); 
       break;
