@@ -1,8 +1,12 @@
 #include <cppQueue.h> // Inclure la bibliothèque cppQueue pour gérer les files d'attente
+#include <stdint.h>
+#include <SPI.h>
+
+#include "serial.h"
 
 // Initialisation de la file d'attente avec une capacité maximale de 10 éléments, type uint8_t, mode FIFO
 cppQueue myQueue(10, sizeof(uint8_t), FIFO);
-byte receivedData[255]; // Définir un tableau pour stocker les données reçues
+uint8_t receivedData[255]; // Définir un tableau pour stocker les données reçues
 int i = 0;
 
 
