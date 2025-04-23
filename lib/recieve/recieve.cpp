@@ -1,5 +1,7 @@
 #include "recieve.h"
 
+#include "../src/config.h"
+
 Receive::Receive(Lorainit &loraModule) : lora(loraModule) {}
 
 void Receive::startReceive() {
@@ -10,7 +12,7 @@ void Receive::startReceive() {
 
 void Receive::receiveMessage() {
     if (lora.lora().available()) {  // Check if a packet is received
-        unsigned char recieved_message[RH_RF95_MAX_MESSAGE_LEN];  // Buffer to store received data
+        unsigned char recieved_message[MAX_BYTES_LEN];  // Buffer to store received data
         unsigned char len = sizeof(recieved_message);
 
         if (lora.lora().recv(recieved_message, &len)) {  // Receive packet
