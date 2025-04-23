@@ -26,6 +26,9 @@ char messageBuffer[MAX_MESSAGE_LEN] = {0};
 bool should_show_message = 0;
 
 Lorainit lora(LORA_SS, LORA_FREQ);
+
+RH_RF95 &loraDevice;
+
 Receive receiver;
 Send sender;
 
@@ -58,22 +61,34 @@ uint8_t decodeAndAnalyseMessage(uint8_t* incomingBytes, char* bufferToModify){
 
 void setup() {
     lora.init();
+
+    RH_RF95 loraDevice(lora.lora());
 }
 
 void loop() {
     // <- fetch message into bytes buffer
+    receiver.startReceive(); // switch mode to recieving
 
-    //ADD CODE HERE
+    unsigned long time_to_end_recieving = millis() + LISTEN_TIME * 1000;
+    uint8_t message_error = 0;
+    while(millis() < time_to_end_recieving){
+        if(!(message_error = receiver.receiveMessage(messageBytesBuffer))) // checks if error code is a success
+            break;
+    }
 
-    // <- decode message, and see what to do with it
+    if (!message_error)
+    {
+        // <- decode message, and see what to do with it
+        uint8_t result = decodeAndAnalyseMessage(messageBytesBuffer, messageBuffer);
 
-    uint8_t result = decodeAndAnalyseMessage(messageBytesBuffer, messageBuffer);
+        // <- decide what to do
+        if (result == MESSAGE_SEEN_CODE)
+            ; //do nothing? (include read reciepts, to see if message has gone further)
+        if (result == MESSAGE_TO_FORWARD_CODE)
+            ; //send message again
+        if (result == MESSAGE_TO_ME_CODE)
+            ; //display message on serial
+    }
 
-    // <- decide what to do
-    if (result == MESSAGE_SEEN_CODE)
-        ; //do nothing? (include read reciepts, to see if message has gone further)
-    if (result == MESSAGE_TO_FORWARD_CODE)
-        ; //send message again
-    if (result == MESSAGE_TO_ME_CODE)
-        ; //display message on serial
+    // <- send message?
 }
