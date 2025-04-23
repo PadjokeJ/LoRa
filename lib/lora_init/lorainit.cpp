@@ -1,5 +1,7 @@
 #include "lorainit.h"
 
+#include "../src/config.h"
+
 Lorainit::Lorainit(int ssPin, int freq) 
   : rf95(ssPin) {  // Initialisation de RH_RF95 avec NSS uniquement
     _ssPin = ssPin;
@@ -26,7 +28,7 @@ void Lorainit::init() {
     Serial.println(_freq);
 
     // Configuration de la puissance d'émission
-    rf95.setTxPower(21, false);
+    rf95.setTxPower(LORA_STRENGTH, false);
 
     Serial.println("LoRa module initialized.");
 }
