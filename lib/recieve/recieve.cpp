@@ -1,5 +1,7 @@
 #include "recieve.h"
 
+#include <stdint.h>
+
 #include "../src/config.h"
 
 Receive::Receive(Lorainit &loraModule) : lora(loraModule) {}
