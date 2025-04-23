@@ -2,9 +2,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
-int comparaison(uint16_t id, uint16_t* knownlist, int taille) {  // Déclare la fonction 'comparaison' qui prend l'ID du destinataire, l'ID du paquet, un tableau d'IDs, l'ID de l'expéditeur et la taille du tableau.
+int comparaison(uint8_t id, uint8_t* knownlist, int taille) {  // Déclare la fonction 'comparaison' qui prend l'ID du destinataire, l'ID du paquet, un tableau d'IDs, l'ID de l'expéditeur et la taille du tableau.
     int known = 0;  // Déclare et initialise la variable 'known' à 0, qui indiquera si l'ID a été trouvé dans le tableau.
-    uint16_t *tmp;
+    uint8_t *tmp;
     int verif;
     for (int i = 0; knownlist[i] != 0; i++) {  // Parcourt le tableau d'IDs jusqu'à la taille actuelle du tableau.
         if (knownlist[i] == id) {  // Si l'élément actuel du tableau correspond à l'ID cherché.
