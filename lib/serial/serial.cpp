@@ -19,14 +19,17 @@ void SerialInput() {
   }
 
   if(c == '\n' || c == '\r') {
-    if(i>0) {
+    if(i > 0) {
       if (!myQueue.isFull()) { // Vérifier que la file d'attente n'est pas pleine
         myQueue.push(receivedData); // Ajouter les données à la file d'attente
         Serial.print(">>>> Queued this: "); // Afficher un message pour les données ajoutées
+        
         for(int j = 0; j < i; j++)
           Serial.print(char(receivedData[j])); // Convertir et afficher les caractères reçus
+        
         Serial.println(""); // Passer à la ligne suivante
-      } else {
+      } 
+      else {
         Serial.println("Erreur : La file est pleine !"); // Afficher une erreur si la file est pleine
       }
     } 
