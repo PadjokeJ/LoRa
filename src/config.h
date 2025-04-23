@@ -12,13 +12,14 @@ uint8_t my_address = 0; //change this
 #define MODEM_CONFIG RH_RF95::Bw31_25Cr48Sf512
 
 #define LORA_STRENGTH 20
+#define LORA_SS 10
 #define LORA_FREQ 868 //MHz
 
 #define COMPARISON_LIST_SIZE 16
 uint8_t comparison_list[COMPARISON_LIST_SIZE] = {0};
 
 #define MAX_BYTES_LEN RH_RF95_MAX_MESSAGE_LEN
-#define MAX_MESSAGE_LEN (RH_RF95_MAX_MESSAGE_LEN - 6)
+#define MAX_MESSAGE_LEN (MAX_BYTES_LEN - 6)
 
 #define MESSAGE_SEEN_CODE 0
 #define MESSAGE_TO_ME_CODE 1
