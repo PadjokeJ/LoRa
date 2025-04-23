@@ -11,7 +11,7 @@ class Receive {
   public:
     Receive(Lorainit &loraModule);
     void startReceive();
-    void receiveMessage();
+    uint8_t receiveMessage(uint8_t* message_buffer);
 
   private:
    Lorainit &lora; // Reference to the Lorainit object
