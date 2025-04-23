@@ -46,6 +46,7 @@ void SerialOutput() {
   }
 }
 
+#ifndef __MAIN_SCRIPT__
 void setup() {
   Serial.begin(9600); // Configurer la communication série avec un débit en bauds de 9600
 }
@@ -54,3 +55,4 @@ void loop() {
   SerialInput(); // Appeler la fonction de gestion des entrées série
   SerialOutput(); // Appeler la fonction de gestion des sorties série
 }
+#endif
