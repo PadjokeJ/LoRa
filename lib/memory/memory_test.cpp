@@ -1,13 +1,14 @@
 #include "memory.h"
 #include <stdio.h>
+#include <stdint.h>
 
 int main()
 {   
     int destinataire = 1;
-    uint16_t id = 600;
+    uint8_t id = 60;
     int moi = 2;
     int taille = 2;//taille de la liste known
-    uint16_t knownlist[2] = {0}; //création de la known liste
+    uint8_t knownlist[2] = {0}; //création de la known liste
     knownlist[0] = 700;//Superflu
     knownlist[1] = 710;//Superflu
     if (destinataire == moi){
