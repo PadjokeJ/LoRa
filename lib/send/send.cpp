@@ -1,13 +1,7 @@
 #include <SPI.h>
 #include <RH_RF95.h>
 
-// Define the LoRa module pins
-#define RFM95_CS 10  // NSS
-#define RFM95_RST 9  // Reset
-#define RFM95_INT 2  // DIO0
-
-// Frequency (e.g., 868 MHz for Europe, 915 MHz for US)
-#define RF95_FREQ 868.0
+#include "../src/config.h"
 
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
@@ -30,15 +24,15 @@ void setup() {
 
     Serial.println("LoRa module initialized.");
 
-    if (!rf95.setFrequency(RF95_FREQ)) {
+    if (!rf95.setFrequency(LORA_FREQ)) {
         Serial.println("Failed to set frequency.");
         while (1);
     }
 
     Serial.print("Frequency set to: ");
-    Serial.println(RF95_FREQ);
+    Serial.println(LORA_FREQ);
 
-    rf95.setTxPower(13, false);  // Transmit power (default 13 dBm)
+    rf95.setTxPower(LORA_STRENGTH, false);  // Transmit power (from config file -> 20 dBm)
 }
 
 void loop() {
