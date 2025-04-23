@@ -18,8 +18,7 @@
 #include "config.h"
 #include <RH_RF95.h>
 
-#define LORA_SS 10     
-#define LORA_FREQ 868
+#define __MAIN_SCRIPT__
 
 uint8_t messageBytesBuffer[MAX_BYTES_LEN] = {0};
 char messageBuffer[MAX_MESSAGE_LEN] = {0};
