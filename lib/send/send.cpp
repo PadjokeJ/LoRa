@@ -1,3 +1,5 @@
+#include "send.h"
+
 #include <SPI.h>
 #include <RH_RF95.h>
 
@@ -5,6 +7,7 @@
 
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
+#ifndef __MAIN_SCRIPT__
 void setup() {
     Serial.begin(9600);
     while (!Serial);
@@ -46,3 +49,4 @@ void loop() {
 
     delay(1000);  // Send every second
 }
+#endif
