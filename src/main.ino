@@ -71,7 +71,7 @@ void loop() {
     unsigned long time_to_end_recieving = millis() + LISTEN_TIME * 1000;
     uint8_t message_error = 0;
     while(millis() < time_to_end_recieving){
-        if(!(message_error = receiver.receiveMessage(messageBytesBuffer))) // checks if error code is a success
+        if((message_error = receiver.receiveMessage(messageBytesBuffer)) == RECIEVE_ERROR_SUCCESS) // checks if error code is a success
             break;
     }
 
@@ -81,13 +81,13 @@ void loop() {
         uint8_t result = decodeAndAnalyseMessage(messageBytesBuffer, messageBuffer);
 
         // <- decide what to do
-        if (result == MESSAGE_SEEN_CODE)
+        if (result == MESSAGE_SEEN_CODE) // message has already been seen before
             ; //do nothing? (include read reciepts, to see if message has gone further)
         if (result == MESSAGE_TO_FORWARD_CODE)
-            ; //send message again
+            sender.sendPackets(messageBytesBuffer);
         if (result == MESSAGE_TO_ME_CODE)
-            ; //display message on serial
+            Serial.println(messageBuffer); //display message on serial
     }
 
-    // <- send message?
+    // <- send message from serial?
 }
