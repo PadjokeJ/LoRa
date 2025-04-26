@@ -27,8 +27,6 @@ bool should_show_message = 0;
 
 Lorainit lora(LORA_SS, LORA_FREQ);
 
-RH_RF95 &loraDevice;
-
 Receive receiver;
 Send sender;
 
@@ -62,7 +60,8 @@ uint8_t decodeAndAnalyseMessage(uint8_t* incomingBytes, char* bufferToModify){
 void setup() {
     lora.init();
 
-    RH_RF95 loraDevice(lora.lora());
+    Receive receiver(lora);
+    Send sender(lora);
 }
 
 void loop() {
