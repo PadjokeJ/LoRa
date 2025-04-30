@@ -91,7 +91,10 @@ void loop() {
         if (result == MESSAGE_SEEN_CODE) // message has already been seen before
             ; //do nothing? (include read reciepts, to see if message has gone further)
         if (result == MESSAGE_TO_FORWARD_CODE)
+        {
+            sender.startSend();
             sender.sendPackets(messageBytesBuffer);
+        }
         if (result == MESSAGE_TO_ME_CODE)
             Serial.println(messageBuffer); //display message on serial
     }
