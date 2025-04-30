@@ -1,49 +1,52 @@
 #include <cppQueue.h> // Inclure la bibliothèque cppQueue pour gérer les files d'attente
 #include <stdint.h>
 #include <SPI.h>
+#include "../../src/config.h"
 
 #include "serial.h"
 
-// Initialisation de la file d'attente avec une capacité maximale de 10 éléments, type uint8_t, mode FIFO
-cppQueue myQueue(10, sizeof(uint8_t), FIFO);
-uint8_t receivedData[255]; // Définir un tableau pour stocker les données reçues
+uint8_t receivedData[MAX_MESSAGE_LEN]; // Définir un tableau pour stocker les données reçues
 int i = 0;
 
 
-void SerialInput() {
+void SerialInput(cppQueue queue) {
   char c = '\0';
 
   while(Serial.available() > 0) {
     c = Serial.read();
+    if(c == '\n' || c == '\r') break; // un retour à la ligne ajoute le message à la queue
+
     receivedData[i++] = c;
   }
 
-  if(c == '\n' || c == '\r') {
-    if(i > 0) {
-      if (!myQueue.isFull()) { // Vérifier que la file d'attente n'est pas pleine
-        myQueue.push(receivedData); // Ajouter les données à la file d'attente
-        Serial.print(">>>> Queued this: "); // Afficher un message pour les données ajoutées
-        
-        for(int j = 0; j < i; j++)
-          Serial.print(char(receivedData[j])); // Convertir et afficher les caractères reçus
-        
-        Serial.println(""); // Passer à la ligne suivante
-      } 
-      else {
-        Serial.println("Erreur : La file est pleine !"); // Afficher une erreur si la file est pleine
-      }
+  
+  if(i > 0 || i < MAX_MESSAGE_LEN - 1) {
+    if (!queue.isFull()) { // Vérifier que la file d'attente n'est pas pleine
+      queue.push(receivedData); // Ajouter les données à la file d'attente
+      Serial.print(">>>> Queued this: "); // Afficher un message pour les données ajoutées
+      
+      for(int j = 0; j < i; j++)
+        Serial.print(char(receivedData[j])); // Convertir et afficher les caractères reçus
+      
+      Serial.println(""); // Passer à la ligne suivante
     } 
-    receivedData[i++] = '\0';
-    i = 0;
-  }
+    else {
+      Serial.println("Erreur : La file est pleine !"); // Afficher une erreur si la file est pleine
+    }
+  } 
+  receivedData[i++] = '\0';
+  i = 0;
 }
 
-void SerialOutput() {
-  if (!myQueue.isEmpty()) { // Vérifier que la file d'attente n'est pas vide
-    uint8_t dataToSend; // Variable pour stocker l'élément à envoyer
-    myQueue.pop(&dataToSend); // Récupérer et retirer l'élément en tête de la file d'attente
+uint8_t* SerialOutput(cppQueue queue) {
+  uint8_t* dataToSend;
+  if (!queue.isEmpty()) { // Vérifier que la file d'attente n'est pas vide
+    dataToSend = queue.front(); // Variable pour stocker l'élément à envoyer
+    queue.pop(); // Retirer l'élément en tête de la file d'attente
     Serial.println(dataToSend); // Envoyer l'élément via la communication série
   }
+
+  return dataToSend;
 }
 
 #ifndef __MAIN_SCRIPT__

@@ -5,8 +5,10 @@
 #include <stdint.h>
 #include <SPI.h>
 
-void SerialInput();
+#include <stdint.h>
 
-void SerialOutput();
+void SerialInput(cppQueue queue);
+
+uint8_t* SerialOutput(cppQueue queue);
 
 #endif

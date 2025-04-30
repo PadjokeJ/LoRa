@@ -4,6 +4,7 @@
 *   Run command:
 *       .\app.exe
 */
+#define __MAIN_SCRIPT__
 
 #include <Arduino.h>
 #include "../lib/encode/encode.h"
@@ -18,10 +19,13 @@
 #include "config.h"
 #include <RH_RF95.h>
 
-#define __MAIN_SCRIPT__
+#include <cppQueue.h>
 
 uint8_t messageBytesBuffer[MAX_BYTES_LEN] = {0};
 char messageBuffer[MAX_MESSAGE_LEN] = {0};
+
+// Initialisation de la file d'attente avec une capacité maximale de 10 éléments, type uint8_t, mode FIFO
+cppQueue myQueue(10, sizeof(uint8_t), FIFO);
 
 bool should_show_message = 0;
 
