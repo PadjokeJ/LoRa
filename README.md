@@ -15,8 +15,8 @@ Ordre des choses
 
 ### Phase 2 - Réalisation 1  
 
-- [ ] code
-- [ ] documentation
+- [x] code
+- [x] documentation
 - [ ] tester
 
 ### Phase 3 - Réalisation 2  
@@ -44,18 +44,18 @@ Ordre des choses
 ## Tâches  
 
 - [ ] main
-- [ ] serial input
+- [x] serial input
 - [x] encode
 - [x] decode
-- [ ] add sent queue
-- [ ] send
-- [ ] recieve
-- [ ] add recieve queue
-- [ ] process recieve
-- [ ] recieve
-- [ ] if know list
-- [ ] add know list
-- [ ] serial output
+- [x] add sent queue
+- [x] send
+- [x] recieve
+- [x] add recieve queue
+- [x] process recieve
+- [x] recieve
+- [x] if know list
+- [x] add know list
+- [x] serial output
 
 ## Packet  
 
