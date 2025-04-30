@@ -2,6 +2,7 @@
 #define CONFIG_H
 
 #include <stdint.h>
+#include <RH_RF95.h>
 
 uint8_t my_address = 0; //change this
 #define LISTEN_TIME 10 //in seconds
