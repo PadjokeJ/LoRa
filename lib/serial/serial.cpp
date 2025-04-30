@@ -50,12 +50,14 @@ uint8_t* SerialOutput(cppQueue queue) {
 }
 
 #ifndef __MAIN_SCRIPT__
+cppQueue myQueue(10, sizeof(uint8_t), FIFO);
+
 void setup() {
   Serial.begin(9600); // Configurer la communication série avec un débit en bauds de 9600
 }
 
 void loop() {
-  SerialInput(); // Appeler la fonction de gestion des entrées série
-  SerialOutput(); // Appeler la fonction de gestion des sorties série
+  SerialInput(myQueue); // Appeler la fonction de gestion des entrées série
+  SerialOutput(myQueue); // Appeler la fonction de gestion des sorties série
 }
 #endif
