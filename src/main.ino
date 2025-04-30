@@ -66,9 +66,12 @@ void setup() {
 
     Receive receiver(lora);
     Send sender(lora);
+
+    resetBuffers();
 }
 
 void loop() {
+    resetBuffers();
     // <- fetch message into bytes buffer
     receiver.startReceive(); // switch mode to recieving
 
