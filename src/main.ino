@@ -6,7 +6,10 @@
 */
 #define __MAIN_SCRIPT__
 
+#include "config.h"
+
 #include <Arduino.h>
+#include "../lib/lora_init/lorainit.h"
 #include "../lib/encode/encode.h"
 #include "../lib/decode/decode.h"
 #include "../lib/packet/packet.h"
@@ -16,7 +19,6 @@
 #include "../lib/send/send.h"
 #include "../lib/serial/serial.h"
 
-#include "config.h"
 #include <RH_RF95.h>
 
 #include <cppQueue.h>
@@ -31,8 +33,8 @@ bool should_show_message = 0;
 
 Lorainit lora(LORA_SS, LORA_FREQ);
 
-Receive receiver;
-Send sender;
+Receive receiver = Receive(lora);
+Send sender = Send(lora);
 
 void resetBuffers(){ 
     for (int i = 0; i < MAX_BYTES_LEN; i++)
@@ -63,9 +65,6 @@ uint8_t decodeAndAnalyseMessage(uint8_t* incomingBytes, char* bufferToModify){
 
 void setup() {
     lora.init();
-
-    Receive receiver(lora);
-    Send sender(lora);
 
     resetBuffers();
 }

@@ -51,7 +51,6 @@ void setup() {
 
 void loop() {
   //sendtest();
-    recieve();
     // Process messages from the queue
     if (!messageQueue.isEmpty() && !lengthQueue.isEmpty()) {
         unsigned char messageLength;

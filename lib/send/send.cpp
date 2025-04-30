@@ -4,7 +4,7 @@
 #include <SPI.h>
 #include <RH_RF95.h>
 
-#include "../src/config.h"
+#include "../../src/config.h"
 
 Send::Send(Lorainit &loraModule) : lora(loraModule) {}
 
