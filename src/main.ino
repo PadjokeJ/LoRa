@@ -65,6 +65,7 @@ uint8_t decodeAndAnalyseMessage(uint8_t* incomingBytes, char* bufferToModify){
 
 void setup() {
     lora.init();
+    Serial.begin(9600);
 
     resetBuffers();
 }
