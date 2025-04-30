@@ -9,6 +9,6 @@
 
 void SerialInput(cppQueue queue);
 
-uint8_t* SerialOutput(cppQueue queue);
+void SerialOutput(cppQueue queue, char* array_buffer);
 
 #endif

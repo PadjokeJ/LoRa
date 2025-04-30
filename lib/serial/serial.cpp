@@ -38,19 +38,21 @@ void SerialInput(cppQueue queue) {
   i = 0;
 }
 
-uint8_t* SerialOutput(cppQueue queue) {
+void SerialOutput(cppQueue queue, char* array_buffer) {
   uint8_t* dataToSend;
   if (!queue.isEmpty()) { // Vérifier que la file d'attente n'est pas vide
     dataToSend; // Variable pour stocker l'élément à envoyer
     queue.pop(&dataToSend); // Retirer l'élément en tête de la file d'attente
     Serial.println((char)dataToSend); // Envoyer l'élément via la communication série
-  }
 
-  return dataToSend;
+    array_buffer = (char*)dataToSend;
+  }
 }
 
 #ifndef __MAIN_SCRIPT__
 cppQueue myQueue(10, sizeof(uint8_t), FIFO);
+
+char message_buffer[MAX_MESSAGE_LEN - 6];
 
 void setup() {
   Serial.begin(9600); // Configurer la communication série avec un débit en bauds de 9600
@@ -58,6 +60,6 @@ void setup() {
 
 void loop() {
   SerialInput(myQueue); // Appeler la fonction de gestion des entrées série
-  SerialOutput(myQueue); // Appeler la fonction de gestion des sorties série
+  SerialOutput(myQueue, message_buffer); // Appeler la fonction de gestion des sorties série
 }
 #endif
