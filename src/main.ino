@@ -107,10 +107,11 @@ void loop() {
     sender.startSend();
     while(!myQueue.isEmpty()) // repeat for every message in queue
     {
+        struct packet packet_to_send;
         resetBuffers();
         SerialOutput(myQueue, messageBuffer);
-        messageBytesBuffer* = encode_message_to_send(my_address, 0, messageBuffer);
+        packet_to_send = encode_message_to_send(my_address, 0, messageBuffer);
 
-        sender.sendPackets(messageBytesBuffer);
+        sender.sendPackets(packet_to_send.encoded_bytes);
     }
 }
