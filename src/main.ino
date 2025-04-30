@@ -94,4 +94,17 @@ void loop() {
     }
 
     // <- send message from serial?
+
+    
+
+    SerialInput(myQueue); // get user input
+    sender.startSend();
+    while(!myQueue.empty()) // repeat for every message in queue
+    {
+        resetBuffers();
+        messageBuffer = SerialOutput(myQueue);
+        messageBytesBuffer = encode_message_to_send(my_address, 0, messageBuffer);
+
+        sender.sendPackets(messageBytesBuffer);
+    }
 }
