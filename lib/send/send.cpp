@@ -1,13 +1,27 @@
 #include "send.h"
 
+#include <stdint.h>
 #include <SPI.h>
 #include <RH_RF95.h>
 
 #include "../src/config.h"
 
-RH_RF95 rf95(RFM95_CS, RFM95_INT);
+Send::Send(Lorainit &loraModule) : lora(loraModule) {}
+
+Send::startSend(){
+    Serial.println("Setting send mode...");
+    lora.lora().setModeRx();  // Mettre le module en mode envoi
+    Serial.println("LoRa module is in send mode.");
+}
+
+Send::sendPackets(uint8_t* packet){
+    lora.lora().send(packet, 0); // envoie le packet
+    lora.lora().waitPacketSent(); // wait until the packet has finished sending
+}
 
 #ifndef __MAIN_SCRIPT__
+RH_RF95 rf95(RFM95_CS, RFM95_INT);
+
 void setup() {
     Serial.begin(9600);
     while (!Serial);
