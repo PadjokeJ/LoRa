@@ -41,9 +41,9 @@ void SerialInput(cppQueue queue) {
 uint8_t* SerialOutput(cppQueue queue) {
   uint8_t* dataToSend;
   if (!queue.isEmpty()) { // Vérifier que la file d'attente n'est pas vide
-    dataToSend = queue.front(); // Variable pour stocker l'élément à envoyer
-    queue.pop(); // Retirer l'élément en tête de la file d'attente
-    Serial.println(dataToSend); // Envoyer l'élément via la communication série
+    dataToSend; // Variable pour stocker l'élément à envoyer
+    queue.pop(&dataToSend); // Retirer l'élément en tête de la file d'attente
+    Serial.println((char)dataToSend); // Envoyer l'élément via la communication série
   }
 
   return dataToSend;
