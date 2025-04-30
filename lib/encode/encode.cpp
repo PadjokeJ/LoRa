@@ -61,9 +61,9 @@ struct packet encode_message_reciept(struct packet recieved_packet){
     uint8_t dest = recieved_packet.destination; // retrieve the destination address from the packet structure
     char *message = recieved_packet.message; // retrieve the message array from the packet structure
 
-    uint8_t type = ~1; // since typical message is of type 1, invert the bits to get the read type
+    uint8_t type = ~ recieved_packet.type; // since typical message is of type 1, invert the bits to get the read type
 
-    return encode(~1, identifier, source, dest, message); // return a packet for this type (read reciept)
+    return encode(type, identifier, source, dest, message); // return a packet for this type (read reciept)
 }
 
 struct packet encode_message_to_send(uint8_t source, uint8_t dest, char* message){
