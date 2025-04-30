@@ -8,13 +8,13 @@
 
 Send::Send(Lorainit &loraModule) : lora(loraModule) {}
 
-Send::startSend(){
+void Send::startSend(){
     Serial.println("Setting send mode...");
     lora.lora().setModeRx();  // Mettre le module en mode envoi
     Serial.println("LoRa module is in send mode.");
 }
 
-Send::sendPackets(uint8_t* packet){
+void Send::sendPackets(uint8_t* packet){
     lora.lora().send(packet, 0); // envoie le packet
     lora.lora().waitPacketSent(); // wait until the packet has finished sending
 }
