@@ -10,6 +10,7 @@ const int OUR_ID = 0x01;
 // File d'attente pour stocker les paquets reçus
 Queue<String> receiveQueue(10);
 
+#ifndef __MAIN_SCRIPT__
 void setup() {
     Serial.begin(9600);
     while (!Serial);
@@ -22,6 +23,7 @@ void setup() {
     }
     Serial.println("LoRa initialisé avec succès");
 }
+
 
 void loop() {
     int packetSize = LoRa.parsePacket();
@@ -43,6 +45,7 @@ void loop() {
         }
     }
 }
+#endif
 
 void processReceive() {
     if (!receiveQueue.isEmpty()) {
