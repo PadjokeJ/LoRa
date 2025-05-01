@@ -38,14 +38,14 @@ int main(){
     }
     putchar('\n');
 
-    pack = decode(pack.encoded_bytes);
+    struct packet pack2 = decode(pack.encoded_bytes);
 
-    printf("ID \t:\t%d\n", pack.identifier);
-    printf("Type \t:\t%d\n", pack.type);
-    printf("source \t:\t%d\n", pack.source);
-    printf("dest \t:\t%d\n", pack.destination);
-    printf("size \t:\t%d\n", pack.size);
-    printf("message\t:\t%s\n", pack.message);
+    printf("ID \t:\t%d\n", pack2.identifier);
+    printf("Type \t:\t%d\n", pack2.type);
+    printf("source \t:\t%d\n", pack2.source);
+    printf("dest \t:\t%d\n", pack2.destination);
+    printf("size \t:\t%d\n", pack2.size);
+    printf("message\t:\t%s\n", pack2.message);
 
     return 0;
 }
