@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #include "encode.h"
-#include "../packet/packet.h"
+#include "packet.h"
 
 uint8_t size_of_message(char* message){
     uint8_t size;
@@ -14,7 +14,7 @@ uint8_t size_of_message(char* message){
     return size;
 }
 
-struct packet encode(uint8_t packet_type, uint16_t identifier, uint8_t source_address, uint8_t destination_address, char* message){ 
+struct packet encode(uint8_t packet_type, uint16_t identifier, uint8_t source_address, uint8_t destination_address, char* message, uint8_t* buffer){ 
     struct packet encoding_packet = to_packet_struct(packet_type, identifier, source_address, destination_address, message); // convert the packet info to a struct
 
     char* ptr_message = encoding_packet.message; // set a pointer to the start of the message array
@@ -42,12 +42,16 @@ struct packet encode(uint8_t packet_type, uint16_t identifier, uint8_t source_ad
     *ptr_encoded_bytes = encoding_packet.size; // copy the packet type byte to the encoded bytes
     ptr_encoded_bytes++; // move the pointer to message start
 
-
+    int i = 0;
     while(*ptr_message){
+        buffer[i] = (uint8_t)*ptr_message;
         *ptr_encoded_bytes = (uint8_t)*ptr_message; // transform char to 8bit
         ptr_encoded_bytes++;
         ptr_message++;
+        i++;
     }
+    *ptr_encoded_bytes = 0;
+    buffer[i] = 0;
 
 
     encoding_packet.encoded_bytes = encoded_bytes; //set the message bytes inside of the packet structure
@@ -55,7 +59,7 @@ struct packet encode(uint8_t packet_type, uint16_t identifier, uint8_t source_ad
     return encoding_packet;
 }
 
-struct packet encode_message_reciept(struct packet recieved_packet){
+struct packet encode_message_reciept(struct packet recieved_packet, uint8_t* buffer){
     uint16_t identifier = recieved_packet.identifier; // retrieve the identifier from the packet structure
     uint8_t source = recieved_packet.source; // retrieve the source address from the packet structure
     uint8_t dest = recieved_packet.destination; // retrieve the destination address from the packet structure
@@ -63,14 +67,14 @@ struct packet encode_message_reciept(struct packet recieved_packet){
 
     uint8_t type = ~ recieved_packet.type; // since typical message is of type 1, invert the bits to get the read type
 
-    return encode(type, identifier, source, dest, message); // return a packet for this type (read reciept)
+    return encode(type, identifier, source, dest, message, buffer); // return a packet for this type (read reciept)
 }
 
-struct packet encode_message_to_send(uint8_t source, uint8_t dest, char* message){
+struct packet encode_message_to_send(uint8_t source, uint8_t dest, char* message, uint8_t* buffer){
     srand(time(NULL)); // set the seed of the random number generator
     int random_number = rand(); // get a random number
 
     uint16_t identifier = (uint16_t)random_number; //convert the random number to a 16 bit type
 
-    return encode(1, identifier, source, dest, message); // return a packet for this type (message)
+    return encode(1, identifier, source, dest, message, buffer); // return a packet for this type (message)
 }

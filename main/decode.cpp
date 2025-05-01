@@ -4,7 +4,7 @@
 #include "decode.h"
 #include "packet.h"
 
-struct packet decode(uint8_t* packet_bytes){
+struct packet decode(uint8_t* packet_bytes, char* message_buffer){
     struct packet decoding_packet; // declare a packet structure
     decoding_packet.encoded_bytes = packet_bytes; // take the parameter of the function decode
 
@@ -29,10 +29,13 @@ struct packet decode(uint8_t* packet_bytes){
     char* ptr_decoded_bytes{new char[message_size]}; // create an array that have the size of the message
     char* decoded_bytes_array_address = ptr_decoded_bytes; // cpoy the adresse of the begining of the array
 
-    while(*ptr_packet_bytes){ // loop until it is at the end of the array
+    int i = 0;
+    while(*ptr_packet_bytes && i <= message_size){ // loop until it is at the end of the array
         *ptr_decoded_bytes = (char)*ptr_packet_bytes; // take the encoded byte and turn it into a character
+        message_buffer[i] = (char)*ptr_packet_bytes; // take the encoded byte and turn it into a character
         ptr_decoded_bytes++; // go to the next byte to write to
         ptr_packet_bytes++; // go to the next byte to decode
+        i++;
     }
 
     decoding_packet.message = decoded_bytes_array_address; // put the decoded message in the packet structure

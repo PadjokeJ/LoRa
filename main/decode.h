@@ -3,7 +3,7 @@
 
 #include "packet.h"
 
-struct packet decode(uint8_t* packet_bytes);
+struct packet decode(uint8_t* packet_bytes, char* message_buffer);
 
 int get_packet_type(struct packet pack);
 
