@@ -1,4 +1,4 @@
-#include "recieve.h"
+#include "receive.h"
 
 #include <stdint.h>
 
