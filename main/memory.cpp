@@ -21,11 +21,9 @@ int comparaison(uint8_t id, uint8_t* knownlist, int taille) {  // Déclare la fo
                 knownlist[i] = 0;//Réinitialise la knownlist
                 knownlist[0] = id;//Ajoute l'id à la knownlist
             }
-            printf("Liste reset\n"); //Superflu
         }
         else {
             *tmp=id;//Ajoute l id a la knownlist
-            printf("added\n");//Superflu
         }    
     }
     return known;  // Retourne 1 si l'ID a été trouvé (known = 1), sinon retourne 0 (known = 0).
