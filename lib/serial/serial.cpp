@@ -1,7 +1,7 @@
 #include <cppQueue.h> // Inclure la bibliothèque cppQueue pour gérer les files d'attente
 #include <stdint.h>
 #include <SPI.h>
-#include "../../src/config.h"
+#include "../../config.h"
 
 #include "serial.h"
 

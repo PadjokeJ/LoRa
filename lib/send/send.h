@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <RH_RF95.h>
 #include "lorainit.h"
-#include "../../src/config.h"
+#include "../../config.h"
 
 class Send {
     public:

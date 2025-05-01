@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "../../src/config.h"
+#include "../../config.h"
 
 Receive::Receive(Lorainit &loraModule) : lora(loraModule) {}
 

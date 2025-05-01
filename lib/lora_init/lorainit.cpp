@@ -1,6 +1,6 @@
 #include "lorainit.h"
 
-#include "../../src/config.h"
+#include "../../config.h"
 
 Lorainit::Lorainit(int ssPin, int freq) 
   : rf95(ssPin) {  // Initialisation de RH_RF95 avec NSS uniquement
