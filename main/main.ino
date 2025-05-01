@@ -101,6 +101,8 @@ void loop() {
 
     if (message_error == RECIEVE_ERROR_SUCCESS)
     {
+
+
         // <- decode message, and see what to do with it
         uint8_t result = decodeAndAnalyseMessage(messageBytesBuffer, messageBuffer);
 
@@ -141,12 +143,12 @@ void loop() {
     packet_to_send = encode_message_to_send(my_address, 0, "Hello World", messageBytesBuffer);
     for(int i = 0; i < 30; i++)
     {
-        Serial.print(packet_to_send.encoded_bytes[i]);
+        Serial.print(messageBytesBuffer[i]);
         Serial.print(" ");
     }
     Serial.println();
     Serial.println(packet_to_send.message);
-    sender.sendPackets(packet_to_send.encoded_bytes);
+    sender.sendPackets(messageBytesBuffer);
     delay(1000);
     #endif
 }

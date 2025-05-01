@@ -12,19 +12,39 @@ void Receive::startReceive() {
     Serial.println("LoRa module is in receive mode.");
 }
 
-uint8_t Receive::receiveMessage(uint8_t* message_buffer) {
+uint8_t Receive::receiveMessage(uint8_t* msg_buffer) {
+    //Serial.println("BUFFER BEFORE");
+    //Serial.println();
+    //for(int i = 0; i < 30; i++)
+    //{
+    //    Serial.print(msg_buffer[i]);
+    //    Serial.print(" ");
+    //}
+    //Serial.println();
+    //Serial.println("Buffer After");
     if (!lora.lora().available()) {  // Check if a packet is received
         return RECIEVE_ERROR_NO_MESSAGE;
     }
-    uint8_t len = sizeof(message_buffer);
+    uint8_t len = sizeof(msg_buffer);
+    uint8_t buffer[250];
 
-    if (!lora.lora().recv(message_buffer, &len)) {  // Receive packet
+    if (!lora.lora().recv(msg_buffer, &len)) {  // Receive packet
         Serial.println("Receive failed.");
         return RECIEVE_ERROR_FAILED;
     }
 
+    Serial.println();
+    Serial.println("Buffer After");
+
+    for(int i = 0; i < 30; i++)
+    {
+        Serial.print(msg_buffer[i]);
+        Serial.print(" ");
+    }
+    Serial.println();
+
     Serial.print("Received message: ");
-    Serial.write(message_buffer, len);  // Print message
+    Serial.write(msg_buffer, len);  // Print message
     Serial.println();
 
     Serial.print("RSSI: ");
