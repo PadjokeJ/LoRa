@@ -1,4 +1,4 @@
-#include <LoRa.h>
+/*#include <LoRa.h>
 #include <Queue.h>
 
 #define SS 10
@@ -58,3 +58,4 @@ void processReceive() {
 void decode(String packet) {
     Serial.println("Décodage du paquet : " + packet);
 }
+*/
