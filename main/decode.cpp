@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 #include "decode.h"
-#include "../packet/packet.h"
+#include "packet.h"
 
 struct packet decode(uint8_t* packet_bytes){
     struct packet decoding_packet; // declare a packet structure

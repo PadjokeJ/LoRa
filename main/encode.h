@@ -2,7 +2,7 @@
 #define ENCODE_H
 
 #include <stdint.h>
-#include "../packet/packet.h"
+#include "packet.h"
 
 uint8_t size_of_message(char* message);
 

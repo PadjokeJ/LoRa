@@ -15,7 +15,7 @@
 #include "packet.h"
 #include "memory.h"
 #include "process.h"
-#include "recieve.h"
+#include "receive.h"
 #include "send.h"
 #include "serial.h"
 

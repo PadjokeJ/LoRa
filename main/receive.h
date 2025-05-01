@@ -5,7 +5,7 @@
 #include <RH_RF95.h>
 #include "lorainit.h"
 
-#include "../../config.h"
+#include "config.h"
 
 class Receive {
   public:
