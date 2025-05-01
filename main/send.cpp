@@ -1,5 +1,6 @@
 #include "send.h"
 
+#include <Arduino.h>
 #include <stdint.h>
 #include <SPI.h>
 #include <RH_RF95.h>
@@ -15,10 +16,17 @@ void Send::startSend(){
 }
 
 void Send::sendPackets(uint8_t* packet){
+    Serial.print("Sending: ");
+    for(int i = 0; i < 30; i++)
+    {
+        Serial.print(packet[i]);
+        Serial.print(" ");
+    }
+    Serial.println();
     lora.lora().send(packet, 0); // envoie le packet
     lora.lora().waitPacketSent(); // wait until the packet has finished sending
 }
-
+/*
 #ifndef __MAIN_SCRIPT__
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
@@ -63,4 +71,4 @@ void loop() {
 
     delay(1000);  // Send every second
 }
-#endif
+#endif*/

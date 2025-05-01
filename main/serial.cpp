@@ -1,7 +1,7 @@
 #include <cppQueue.h> // Inclure la bibliothèque cppQueue pour gérer les files d'attente
 #include <stdint.h>
 #include <SPI.h>
-#include "../../config.h"
+#include "config.h"
 
 #include "serial.h"
 
@@ -48,7 +48,7 @@ void SerialOutput(cppQueue queue, char* array_buffer) {
     array_buffer = (char*)dataToSend;
   }
 }
-
+/*
 #ifndef __MAIN_SCRIPT__
 cppQueue myQueue(10, sizeof(uint8_t), FIFO);
 
@@ -62,4 +62,4 @@ void loop() {
   SerialInput(myQueue); // Appeler la fonction de gestion des entrées série
   SerialOutput(myQueue, message_buffer); // Appeler la fonction de gestion des sorties série
 }
-#endif
+#endif*/
