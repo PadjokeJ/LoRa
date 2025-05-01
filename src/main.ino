@@ -9,19 +9,23 @@
 #include "config.h"
 
 #include <Arduino.h>
-#include "lib/lora_init/lorainit.h"
-#include "lib/encode/encode.h"
-#include "lib/decode/decode.h"
-#include "lib/packet/packet.h"
-#include "lib/memory/memory.h"
-#include "lib/process/process.h"
-#include "lib/recieve/recieve.h"
-#include "lib/send/send.h"
-#include "lib/serial/serial.h"
+#include "lorainit.h"
+#include "encode.h"
+#include "decode.h"
+#include "packet.h"
+#include "memory.h"
+#include "process.h"
+#include "recieve.h"
+#include "send.h"
+#include "serial.h"
 
 #include <RH_RF95.h>
 
 #include <cppQueue.h>
+
+uint8_t my_address = 0;
+
+uint8_t comparison_list[COMPARISON_LIST_SIZE] = {0};
 
 uint8_t messageBytesBuffer[MAX_BYTES_LEN] = {0};
 char messageBuffer[MAX_MESSAGE_LEN] = {0};
@@ -31,7 +35,7 @@ cppQueue myQueue(10, sizeof(uint8_t), FIFO);
 
 bool should_show_message = 0;
 
-Lorainit lora(LORA_SS, LORA_FREQ);
+Lorainit lora = Lorainit(LORA_SS, LORA_FREQ);
 
 Receive receiver = Receive(lora);
 Send sender = Send(lora);

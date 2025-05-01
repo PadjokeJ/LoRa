@@ -1,10 +1,9 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef __CONFIG_H__
+#define __CONFIG_H__
 
 #include <stdint.h>
 #include <RH_RF95.h>
 
-uint8_t my_address = 0; //change this
 #define LISTEN_TIME 10 //in seconds
 
 #define RFM95_CS   10
@@ -18,7 +17,6 @@ uint8_t my_address = 0; //change this
 #define LORA_FREQ 868 //MHz
 
 #define COMPARISON_LIST_SIZE 16
-uint8_t comparison_list[COMPARISON_LIST_SIZE] = {0};
 
 #define MAX_BYTES_LEN RH_RF95_MAX_MESSAGE_LEN
 #define MAX_MESSAGE_LEN (MAX_BYTES_LEN - 6)
