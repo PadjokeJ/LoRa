@@ -1,6 +1,6 @@
 #include <LoRa.h>
 #include <Queue.h>
-// Paramètres LoRa
+
 #define SS 10
 #define RST 9
 #define DIO0 2
@@ -54,5 +54,4 @@ void processReceive() {
 
 void decode(String packet) {
     Serial.println("Décodage du paquet : " + packet);
-    // Ajouter ici le vrai décodage du message
 }
