@@ -5,6 +5,7 @@
 *       .\app.exe
 */
 #define __MAIN_SCRIPT__
+//#define DEBUG_SENDER
 
 #include "config.h"
 
@@ -49,8 +50,16 @@ void resetBuffers(){
 
 uint8_t decodeAndAnalyseMessage(uint8_t* incomingBytes, char* bufferToModify){
     struct packet incomingPacket;
+
+    for(int i = 0; i < 30; i++)
+        Serial.print(incomingBytes[i]);
     // decode the message
-    incomingPacket = decode(incomingBytes);
+    incomingPacket = decode(incomingBytes, bufferToModify);
+
+    Serial.println();
+
+    for(int i = 0; i < 30; i++)
+        Serial.print(bufferToModify[i]);
 
     bool hasSeenThisMessage = comparaison(incomingPacket.identifier, comparison_list, COMPARISON_LIST_SIZE);
 
@@ -69,12 +78,16 @@ uint8_t decodeAndAnalyseMessage(uint8_t* incomingBytes, char* bufferToModify){
 
 void setup() {
     lora.init();
-    Serial.begin(9600);
+
+    Serial.println();
+    Serial.println("----------------------------------[ RESTART ]----------------------------------");
+    Serial.println();
 
     resetBuffers();
 }
 
 void loop() {
+    #ifndef DEBUG_SENDER
     resetBuffers();
     // <- fetch message into bytes buffer
     receiver.startReceive(); // switch mode to recieving
@@ -86,10 +99,12 @@ void loop() {
             break;
     }
 
-    if (!message_error)
+    if (message_error == RECIEVE_ERROR_SUCCESS)
     {
         // <- decode message, and see what to do with it
         uint8_t result = decodeAndAnalyseMessage(messageBytesBuffer, messageBuffer);
+
+        //Serial.println(messageBuffer);
 
         // <- decide what to do
         if (result == MESSAGE_SEEN_CODE) // message has already been seen before
@@ -108,14 +123,30 @@ void loop() {
     
 
     SerialInput(myQueue); // get user input
-    sender.startSend();
+    if(!myQueue.isEmpty())
+        sender.startSend();
     while(!myQueue.isEmpty()) // repeat for every message in queue
     {
         struct packet packet_to_send;
         resetBuffers();
         SerialOutput(myQueue, messageBuffer);
-        packet_to_send = encode_message_to_send(my_address, 0, messageBuffer);
+        packet_to_send = encode_message_to_send(my_address, 0, messageBuffer, messageBytesBuffer);
 
         sender.sendPackets(packet_to_send.encoded_bytes);
     }
+    #endif
+    #ifdef DEBUG_SENDER
+    sender.startSend();
+    struct packet packet_to_send;
+    packet_to_send = encode_message_to_send(my_address, 0, "Hello World", messageBytesBuffer);
+    for(int i = 0; i < 30; i++)
+    {
+        Serial.print(packet_to_send.encoded_bytes[i]);
+        Serial.print(" ");
+    }
+    Serial.println();
+    Serial.println(packet_to_send.message);
+    sender.sendPackets(packet_to_send.encoded_bytes);
+    delay(1000);
+    #endif
 }
