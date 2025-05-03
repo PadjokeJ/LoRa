@@ -61,7 +61,7 @@ Ordre des choses
 
 | Type | PACKET_ID | SRC | DEST | SIZE | PAYLOAD |
 | :----: | :----: | :----: | :----: | :----: | :----: |
-| 8 | 16 | 8 | 8 | 8 | size - 6 |
+| 1 | 2 | 1 | 1 | 1 | size - 6 |
 
 il n'y a pas de type de variable en c sur 4 bits, du coup le type sera sur 4 bits  
 la taille est représentée en octets
