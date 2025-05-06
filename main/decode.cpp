@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "decode.h"
 #include "packet.h"
@@ -39,6 +40,7 @@ struct packet decode(uint8_t* packet_bytes, char* message_buffer){
     }
 
     decoding_packet.message = decoded_bytes_array_address; // put the decoded message in the packet structure
+    free(ptr_decoded_bytes); // remove dynamically allocated array, to prevent memory leaks
     return decoding_packet;
 }
 
