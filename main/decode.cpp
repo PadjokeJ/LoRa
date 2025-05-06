@@ -40,7 +40,8 @@ struct packet decode(uint8_t* packet_bytes, char* message_buffer){
     }
 
     decoding_packet.message = decoded_bytes_array_address; // put the decoded message in the packet structure
-    free(ptr_decoded_bytes); // remove dynamically allocated array, to prevent memory leaks
+    free(decoded_bytes_array_address); // remove dynamically allocated array, to prevent memory leaks
+    
     return decoding_packet;
 }
 
