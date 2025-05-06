@@ -95,7 +95,7 @@ void loop() {
     unsigned long time_to_end_recieving = millis() + LISTEN_TIME * 1000;
     uint8_t message_error = 0;
     while(millis() < time_to_end_recieving){
-        if((message_error = receiver.receiveMessage(messageBytesBuffer)) == RECIEVE_ERROR_SUCCESS) // checks if error code is a success
+        if((message_error = receiver.receiveMessage(messageBytesBuffer, sizeof(messageBytesBuffer)) == RECIEVE_ERROR_SUCCESS) // checks if error code is a success
             break;
     }
 

@@ -25,7 +25,7 @@ uint8_t Receive::receiveMessage(uint8_t* msg_buffer) {
     if (!lora.lora().available()) {  // Check if a packet is received
         return RECIEVE_ERROR_NO_MESSAGE;
     }
-    uint8_t len = sizeof(msg_buffer);
+    uint8_t len = max_len;
     uint8_t buffer[250];
 
     if (!lora.lora().recv(msg_buffer, &len)) {  // Receive packet

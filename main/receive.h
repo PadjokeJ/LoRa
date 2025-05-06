@@ -11,11 +11,10 @@ class Receive {
   public:
     Receive(Lorainit &loraModule);
     void startReceive();
-    uint8_t receiveMessage(uint8_t* message_buffer);
+    uint8_t receiveMessage(uint8_t* message_buffer, uint8_t max_len);
 
   private:
-   Lorainit &lora; // Reference to the Lorainit object
-  
+    Lorainit &lora;
 };
 
 #endif
