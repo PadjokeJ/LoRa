@@ -2,37 +2,39 @@
 
 #include "config.h"
 
+
+//-------------------------Constructeur de Lorainit------------------------
 Lorainit::Lorainit(int ssPin, int freq) 
-  : rf95(ssPin) {  // Initialisation de RH_RF95 avec NSS uniquement
     _ssPin = ssPin;
     _freq = freq;
+    _rf95 = new RH_RF95(_ssPin);
 }
 
 void Lorainit::init() {
-    Serial.begin(9600);
-    while (!Serial);
+    Serial.begin(9600); //initialise la communication avec l'ordi au cas ou
+    while (!Serial);    // attent la connection serial avec l'ordi
 
     // Initialisation du LoRa
-    if (!rf95.init()) {
+    if (!_rf95->init()) {
         Serial.println("LoRa module initialization failed!");
-        while (1);
+        while (1);      // Boucle infinie en cas d’échec
     }
 
     // Configuration de la fréquence
-    if (!rf95.setFrequency(_freq)) {
+    if (!_rf95->setFrequency(_freq)) {
         Serial.println("Failed to set frequency.");
-        while (1);
+        while (1);  // Boucle infinie en cas d’échec
     }
 
     Serial.print("LoRa operating on frequency: ");
     Serial.println(_freq);
 
     // Configuration de la puissance d'émission
-    rf95.setTxPower(LORA_STRENGTH, false);
+    _rf95->setTxPower(LORA_STRENGTH, false);
 
     Serial.println("LoRa module initialized.");
 }
 
 RH_RF95& Lorainit::lora() {
-    return rf95; // Return a reference to the rf95 object
+    return *_rf95;
 }

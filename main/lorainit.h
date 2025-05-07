@@ -14,7 +14,7 @@ class Lorainit {
   private:
     int _ssPin;
     int _freq;
-    RH_RF95 rf95;
+    RH_RF95* _rf95;
 };
 
 #endif
