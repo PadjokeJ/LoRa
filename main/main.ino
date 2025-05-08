@@ -1,154 +1,42 @@
-/*
-*   Compile command:
-*       g++ .\src\main.cpp .\lib\encode\encode.cpp .\lib\decode\decode.cpp .\lib\packet\packet.cpp .\lib\memory\memory.cpp .\lib\process\process.cpp .\lib\recieve\recieve.cpp .\lib\send\send.cpp .\lib\serial\serial.cpp -o app.exe
-*   Run command:
-*       .\app.exe
-*/
-#define __MAIN_SCRIPT__
-//#define DEBUG_SENDER
-
-#include "config.h"
-
-#include <Arduino.h>
-#include "lorainit.h"
-#include "encode.h"
-#include "decode.h"
-#include "packet.h"
-#include "memory.h"
-#include "process.h"
-#include "receive.h"
-#include "send.h"
-#include "serial.h"
-
+#include <SPI.h>
 #include <RH_RF95.h>
 
-#include <cppQueue.h>
+#include "packet.h"
+#include "decode.h"
+#include "encode.h"
 
-uint8_t my_address = 0;
+#define RFM95_CS      10  // Chip Select pin
+#define RFM95_RST     9   // Reset pin
+#define RFM95_INT     2   // Interrupt pin (DIO0)
+#define RF95_FREQ     868.0 // Frequency (set according to your region)
 
-uint8_t comparison_list[COMPARISON_LIST_SIZE] = {0};
-
-uint8_t messageBytesBuffer[MAX_BYTES_LEN] = {0};
-char messageBuffer[MAX_MESSAGE_LEN] = {0};
-
-// Initialisation de la file d'attente avec une capacité maximale de 10 éléments, type uint8_t, mode FIFO
-cppQueue myQueue(10, sizeof(uint8_t), FIFO);
-
-bool should_show_message = 0;
-
-Lorainit lora = Lorainit(LORA_SS, LORA_FREQ);
-
-Receive receiver = Receive(lora);
-Send sender = Send(lora);
-
-void resetBuffers(){ 
-    for (int i = 0; i < MAX_BYTES_LEN; i++)
-        messageBytesBuffer[i] = 0;
-    for (int i = 0; i < MAX_MESSAGE_LEN; i++)
-        messageBuffer[i] = 0;
-}
-
-uint8_t decodeAndAnalyseMessage(uint8_t* incomingBytes, char* bufferToModify){
-    struct packet incomingPacket;
-
-    for(int i = 0; i < 30; i++)
-        Serial.print(incomingBytes[i]);
-    // decode the message
-    incomingPacket = decode(incomingBytes, bufferToModify);
-
-    Serial.println();
-
-    for(int i = 0; i < 30; i++)
-        Serial.print(bufferToModify[i]);
-
-    bool hasSeenThisMessage = comparaison(incomingPacket.identifier, comparison_list, COMPARISON_LIST_SIZE);
-
-    if (hasSeenThisMessage){
-        return MESSAGE_SEEN_CODE;
-    }
-    if(my_address != incomingPacket.destination){
-        return MESSAGE_TO_FORWARD_CODE;
-    }
-    should_show_message = 1;
-    bufferToModify = incomingPacket.message;
-
-    return MESSAGE_TO_ME_CODE;
-    
-}
+RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 void setup() {
-    lora.init();
+  Serial.begin(9600);
+  while (!Serial);
 
-    Serial.println();
-    Serial.println("----------------------------------[ RESTART ]----------------------------------");
-    Serial.println();
+  if (!rf95.init()) {
+    Serial.println("LoRa initialization failed!");
+    while (1);
+  }
+  Serial.println("LoRa initialized successfully!");
 
-    resetBuffers();
+  rf95.setFrequency(RF95_FREQ);  // Set frequency
+  rf95.setTxPower(23, false);  // Set transmit power
 }
 
 void loop() {
-    #ifndef DEBUG_SENDER
-    resetBuffers();
-    // <- fetch message into bytes buffer
-    receiver.startReceive(); // switch mode to recieving
+  uint8_t outbuf[251];
+  struct packet send = encode_message_to_send((uint8_t) 65, (uint8_t) 0, "Hello world!", outbuf);
 
-    unsigned long time_to_end_recieving = millis() + LISTEN_TIME * 1000;
-    uint8_t message_error = 0;
-    while(millis() < time_to_end_recieving){
-        if((message_error = receiver.receiveMessage(messageBytesBuffer, sizeof(messageBytesBuffer)) == RECIEVE_ERROR_SUCCESS) // checks if error code is a success
-            break;
-    }
+  for(int i = 0; i < 30; i++){
+    Serial.print(outbuf[i]);
+    Serial.print(", ");
+  }
 
-    if (message_error == RECIEVE_ERROR_SUCCESS)
-    {
-
-
-        // <- decode message, and see what to do with it
-        uint8_t result = decodeAndAnalyseMessage(messageBytesBuffer, messageBuffer);
-
-        //Serial.println(messageBuffer);
-
-        // <- decide what to do
-        if (result == MESSAGE_SEEN_CODE) // message has already been seen before
-            ; //do nothing? (include read reciepts, to see if message has gone further)
-        if (result == MESSAGE_TO_FORWARD_CODE)
-        {
-            sender.startSend();
-            sender.sendPackets(messageBytesBuffer);
-        }
-        if (result == MESSAGE_TO_ME_CODE)
-            Serial.println(messageBuffer); //display message on serial
-    }
-
-    // <- send message from serial?
-
-    
-
-    SerialInput(myQueue); // get user input
-    if(!myQueue.isEmpty())
-        sender.startSend();
-    while(!myQueue.isEmpty()) // repeat for every message in queue
-    {
-        struct packet packet_to_send;
-        resetBuffers();
-        SerialOutput(myQueue, messageBuffer);
-        packet_to_send = encode_message_to_send(my_address, 0, messageBuffer, messageBytesBuffer);
-
-        sender.sendPackets(packet_to_send.encoded_bytes);
-    }
-    #endif
-    #ifdef DEBUG_SENDER
-    sender.startSend();
-    struct packet packet_to_send;
-    packet_to_send = encode_message_to_send(my_address, 0, "Hello World", messageBytesBuffer);
-    for(int i = 0; i < 30; i++)
-    {
-        Serial.print(messageBytesBuffer[i]);
-        Serial.print(" ");
-    }
-    Serial.println();
-    Serial.println(packet_to_send.message);
-    sender.sendPackets(messageBytesBuffer);
-    delay(1000);
-    #endif
+  rf95.send(outbuf, strlen(outbuf));  // Send message
+  rf95.waitPacketSent();  // Wait until the message is sent
+  Serial.println("Message sent!");
+  delay(1000);  // Wait 1 second before sending the next message
 }
