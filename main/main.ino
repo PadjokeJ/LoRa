@@ -4,6 +4,7 @@
 #include "packet.h"
 #include "decode.h"
 #include "lorainit.h"
+#include "send.h"
 #include "encode.h"
 
 #define RFM95_CS      10  // Chip Select pin
@@ -12,6 +13,7 @@
 #define RF95_FREQ     868.0 // Frequency (set according to your region)
 
 Lorainit lora = Lorainit(RFM95_CS, RF95_FREQ, RFM95_INT);
+Send sender = Send(lora);
 
 void setup() {
   lora.init();
@@ -27,8 +29,7 @@ void loop() {
     Serial.print(", ");
   }
 
-  lora.lora().send(outbuf, strlen(outbuf));  // Send message
-  lora.lora().waitPacketSent();  // Wait until the message is sent
+  sender.sendPackets(outbuf);  // Send message
   Serial.println("Message sent!");
   delay(1000);  // Wait 1 second before sending the next message
 }
