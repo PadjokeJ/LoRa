@@ -12,7 +12,7 @@ void Receive::startReceive() {
     Serial.println("LoRa module is in receive mode.");
 }
 
-uint8_t Receive::receiveMessage(uint8_t* msg_buffer) {
+uint8_t Receive::receiveMessage(uint8_t* msg_buffer, uint8_t max_len) {
     //Serial.println("BUFFER BEFORE");
     //Serial.println();
     //for(int i = 0; i < 30; i++)

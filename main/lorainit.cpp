@@ -4,10 +4,10 @@
 
 
 //-------------------------Constructeur de Lorainit------------------------
-Lorainit::Lorainit(int ssPin, int freq) 
+Lorainit::Lorainit(int ssPin, int freq, int intPin){
     _ssPin = ssPin;
     _freq = freq;
-    _rf95 = new RH_RF95(_ssPin);
+    _rf95 = new RH_RF95(_ssPin, intPin);
 }
 
 void Lorainit::init() {
