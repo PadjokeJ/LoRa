@@ -5,6 +5,7 @@
 #include "decode.h"
 #include "lorainit.h"
 #include "send.h"
+#include "receive.h"
 #include "encode.h"
 
 #define RFM95_CS      10  // Chip Select pin
@@ -14,6 +15,7 @@
 
 Lorainit lora = Lorainit(RFM95_CS, RF95_FREQ, RFM95_INT);
 Send sender = Send(lora);
+Receive receiver = Receive(lora);
 
 void setup() {
   lora.init();
@@ -22,6 +24,7 @@ void setup() {
 
 void loop() {
   uint8_t outbuf[251];
+  uint8_t mLen;
   struct packet send = encode_message_to_send((uint8_t) 65, (uint8_t) 0, "Hello world!", outbuf);
 
   for(int i = 0; i < 30; i++){
@@ -29,7 +32,12 @@ void loop() {
     Serial.print(", ");
   }
 
+  #ifdef SENDER
   sender.sendPackets(outbuf);  // Send message
   Serial.println("Message sent!");
   delay(1000);  // Wait 1 second before sending the next message
+  #endif
+  #ifndef SENDER
+  receiver.receiveMessage(outbuf, mLen);
+  #endif
 }
