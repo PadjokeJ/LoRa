@@ -41,23 +41,29 @@ void setup() {
 void loop() {
   #ifdef SENDER
   uint8_t msgbuf[245] = {0};
+  
   char c = 0;
   int index = 0;
-  while(Serial.available() > 0){
+  while(1){
     c = Serial.read();
-    Serial.print((int)c);
-    Serial.print(", ");
+    if (c != -1){
+      Serial.print((int)c);
+      Serial.print(", ");
 
-    if (c >= 32)
-      msgbuf[index++] = c;
+      if (c >= 32)
+        msgbuf[index++] = c;
 
-    if (c == "\n")
-      break;
-    
+      if (c == 10)
+      {
+        msgbuf[index++] = 0;
+        break;
+      }
+    }
   }
   uint8_t outbuf[251] = {0};
   
   if (msgbuf[0] >= 32){
+    Serial.println();
     Serial.println((char*)msgbuf);
     struct packet send = encode_message_to_send((uint8_t) 65, (uint8_t) 69, msgbuf, outbuf);
 
