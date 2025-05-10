@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <RH_RF95.h>
 
+#define MY_ADDRESS (uint8_t)9
+
 #define LISTEN_TIME 10 //in seconds
 
 #define RFM95_CS   10
@@ -28,6 +30,11 @@
 #define RECIEVE_ERROR_SUCCESS 0
 #define RECIEVE_ERROR_NO_MESSAGE 1
 #define RECIEVE_ERROR_FAILED 2
+// states : STATE_ASK_ADDRESS, STATE_INPUT_ADDRE, STATE_ASK_MESSAGE, STATE_INPUT_MESSA
+#define STATE_ASK_ADDRESS 0
+#define STATE_INPUT_ADDRE 1
+#define STATE_ASK_MESSAGE 2
+#define STATE_INPUT_MESSA 3
 
 
 #endif

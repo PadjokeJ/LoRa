@@ -1,60 +1,42 @@
 #include <time.h>
 #include <stdlib.h>
+#include <Arduino.h>
 
 #include <stdint.h>
 
 #include "encode.h"
 #include "packet.h"
 
-uint8_t size_of_message(char* message){
-    uint8_t size;
-    while(*message++)
-        size++;
-
-    return size;
-}
 
 struct packet encode(uint8_t packet_type, uint16_t identifier, uint8_t source_address, uint8_t destination_address, char* message, uint8_t* buffer){ 
     struct packet encoding_packet = to_packet_struct(packet_type, identifier, source_address, destination_address, message); // convert the packet info to a struct
 
     char* ptr_message = encoding_packet.message; // set a pointer to the start of the message array
 
-    uint8_t message_size = size_of_message(message); // get the message size
+    uint8_t message_size = strlen(message); // get the message size
     encoding_packet.size = message_size; // set the message size inside the packet structure
-
-    uint8_t* encoded_bytes{new uint8_t[message_size + 6]}; // create an uninitialized array with the correct size to include all the information
-    uint8_t* ptr_encoded_bytes = encoded_bytes; // set a pointer to the start of the encoded array start
     
-    *ptr_encoded_bytes = encoding_packet.type; // copy the packet type byte to the encoded bytes
-    ptr_encoded_bytes++; // move the pointer to packet id
+    buffer[0] = encoding_packet.type; // copy the packet type byte to the buffer
 
-    *ptr_encoded_bytes = (uint8_t)((encoding_packet.identifier & 0xFF00) >> 8); // copy the packet identifier byte (the first eight bits) to the encoded bytes
-    ptr_encoded_bytes++; // move the pointer to packet id's second byte
-    *ptr_encoded_bytes = (uint8_t)(encoding_packet.identifier & 0x00FF); // copy the packet identifier byte (the last eight bits) to the encoded bytes
-    ptr_encoded_bytes++; // move the pointer to source
+    buffer[1] = (uint8_t)((encoding_packet.identifier & 0xFF00) >> 8); // copy the packet identifier byte (the first eight bits) to the buffer
+    buffer[2] = (uint8_t)(encoding_packet.identifier & 0x00FF); // copy the packet identifier byte (the last eight bits) to the buffer
     
-    *ptr_encoded_bytes = encoding_packet.source; // copy the packet type byte to the encoded bytes
-    ptr_encoded_bytes++; // move the pointer to dest
+    buffer[3] = encoding_packet.source; // copy the packet type byte to the buffer
 
-    *ptr_encoded_bytes = encoding_packet.destination; // copy the packet type byte to the encoded bytes
-    ptr_encoded_bytes++; // move the pointer to size
+    buffer[4] = encoding_packet.destination; // copy the packet type byte to the buffer
 
-    *ptr_encoded_bytes = encoding_packet.size; // copy the packet type byte to the encoded bytes
-    ptr_encoded_bytes++; // move the pointer to message start
+    buffer[5] = encoding_packet.size; // copy the packet type byte to the buffer
 
-    int i = 0;
+    int i = 6;
     while(*ptr_message){
-        buffer[i] = (uint8_t)*ptr_message;
-        *ptr_encoded_bytes = (uint8_t)*ptr_message; // transform char to 8bit
-        ptr_encoded_bytes++;
+        buffer[i] = (uint8_t)*ptr_message;// transform char to 8bit
         ptr_message++;
         i++;
     }
-    *ptr_encoded_bytes = 0;
     buffer[i] = 0;
 
 
-    encoding_packet.encoded_bytes = encoded_bytes; //set the message bytes inside of the packet structure
+    encoding_packet.encoded_bytes = buffer; //set the message bytes inside of the packet structure
 
     return encoding_packet;
 }
@@ -71,8 +53,8 @@ struct packet encode_message_reciept(struct packet recieved_packet, uint8_t* buf
 }
 
 struct packet encode_message_to_send(uint8_t source, uint8_t dest, char* message, uint8_t* buffer){
-    srand(time(NULL)); // set the seed of the random number generator
-    int random_number = rand(); // get a random number
+    randomSeed(analogRead(0)); // set the seed of the random number generator
+    int random_number = random(65535); // get a random number
 
     uint16_t identifier = (uint16_t)random_number; //convert the random number to a 16 bit type
 

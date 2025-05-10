@@ -25,14 +25,23 @@ struct packet decode(uint8_t* packet_bytes, char* message_buffer){
     uint8_t message_size = packet_bytes[5]; // get the sixth encoded byte as the message size
     decoding_packet.size = message_size; // set the message size inside the packet structure
 
+    uint8_t* ptr_packet_bytes = &packet_bytes[6]; // put a pointer at the begining of the encoded message
+    
+    char* ptr_decoded_bytes{new char[message_size]}; // create an array that have the size of the message
+    char* decoded_bytes_array_address = ptr_decoded_bytes; // cpoy the adresse of the begining of the array
+
     int i = 0;
-    while(packet_bytes[i] && i <= message_size){ // loop until it is at the end of the array
-        message_buffer[i] = packet_bytes[i + 6]; // take the encoded byte and turn it into a character
-        i++; // go to the next byte to decode
+    while(*ptr_packet_bytes && i <= 245){ // loop until it is at the end of the array
+        *ptr_decoded_bytes = (char)*ptr_packet_bytes; // take the encoded byte and turn it into a character
+        message_buffer[i] = (char)*ptr_packet_bytes; // take the encoded byte and turn it into a character
+        ptr_decoded_bytes++; // go to the next byte to write to
+        ptr_packet_bytes++; // go to the next byte to decode
+        i++;
     }
 
-    decoding_packet.message = message_buffer; // put the decoded message in the packet structure
-
+    decoding_packet.message = decoded_bytes_array_address; // put the decoded message in the packet structure
+    free(decoded_bytes_array_address); // remove dynamically allocated array, to prevent memory leaks
+    
     return decoding_packet;
 }
 
