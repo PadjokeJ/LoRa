@@ -10,7 +10,7 @@
 #define RFM95_INT     2   // Interrupt pin (DIO0)
 #define RF95_FREQ     868.0 // Frequency (set according to your region)
 
-//define SENDER
+#define SENDER
 
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
@@ -31,6 +31,7 @@ void setup() {
     Serial.println("LoRa initialization failed!");
     while (1);
   }
+  Serial.println();
   Serial.println("LoRa initialized successfully!");
 
   rf95.setFrequency(RF95_FREQ);  // Set frequency
@@ -39,18 +40,37 @@ void setup() {
 
 void loop() {
   #ifdef SENDER
-  uint8_t outbuf[251] = {0};
-  struct packet send = encode_message_to_send((uint8_t) 65, (uint8_t) 69, "Hello world!", outbuf);
-
-  for(int i = 0; i < 30; i++){
-    Serial.print(outbuf[i]);
+  uint8_t msgbuf[245] = {0};
+  char c = 0;
+  int index = 0;
+  while(Serial.available() > 0){
+    c = Serial.read();
+    Serial.print((int)c);
     Serial.print(", ");
-  }
 
-  rf95.send(outbuf, strlen(outbuf));  // Send message
-  rf95.waitPacketSent();  // Wait until the message is sent
-  Serial.println("Message sent!");
-  delay(1000);  // Wait 1 second before sending the next message
+    if (c >= 32)
+      msgbuf[index++] = c;
+
+    if (c == "\n")
+      break;
+    
+  }
+  uint8_t outbuf[251] = {0};
+  
+  if (msgbuf[0] >= 32){
+    Serial.println((char*)msgbuf);
+    struct packet send = encode_message_to_send((uint8_t) 65, (uint8_t) 69, msgbuf, outbuf);
+
+    for(int i = 0; i < 30; i++){
+      Serial.print(outbuf[i]);
+      Serial.print(", ");
+    }
+
+    rf95.send(outbuf, strlen(outbuf));  // Send message
+    rf95.waitPacketSent();  // Wait until the message is sent
+    Serial.println("Message sent!");
+    delay(1000);  // Wait 1 second before sending the next message
+  }
   #endif
 
   #ifndef SENDER
@@ -59,16 +79,17 @@ void loop() {
   if (rf95.available()) {
     if(rf95.recv(inbuf, &lenMSG))
       {
+        Serial.println();
         Serial.println("Recieved a new message!");
 
-        for(int i = 0; i < 30; i++){
-          Serial.print(inbuf[i]);
-          Serial.print(", ");
-        }
-        Serial.println();
-
         uint8_t message_buffer[251] = {0};
-        decode(inbuf, message_buffer);
+        struct packet rec;
+        rec = decode(inbuf, message_buffer);
+        Serial.print("┌From: ");
+        Serial.println(rec.source);
+        Serial.print("├To: ");
+        Serial.println(rec.destination);
+        Serial.print("└Message: ");
         Serial.println((char*)message_buffer);
       }
   }
