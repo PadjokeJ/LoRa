@@ -14,6 +14,29 @@
 
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
+
+void try_recieve(){
+  uint8_t inbuf[251] = {0};
+  uint8_t lenMSG = sizeof(inbuf);
+  if (rf95.available()) {
+    if(rf95.recv(inbuf, &lenMSG))
+      {
+        Serial.println();
+        Serial.println("Recieved a new message!");
+
+        uint8_t message_buffer[251] = {0};
+        struct packet rec;
+        rec = decode(inbuf, message_buffer);
+        Serial.print("┌From: ");
+        Serial.println(rec.source);
+        Serial.print("├To: ");
+        Serial.println(rec.destination);
+        Serial.print("└Message: ");
+        Serial.println((char*)message_buffer);
+      }
+  }
+}
+
 void setup() {
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
@@ -39,13 +62,13 @@ void setup() {
 }
 
 void loop() {
-  #ifdef SENDER
   uint8_t msgbuf[245] = {0};
   
   char c = 0;
   int index = 0;
   while(1){
     c = Serial.read();
+    try_recieve();
     if (c != -1){
       Serial.print((int)c);
       Serial.print(", ");
@@ -77,27 +100,4 @@ void loop() {
     Serial.println("Message sent!");
     delay(1000);  // Wait 1 second before sending the next message
   }
-  #endif
-
-  #ifndef SENDER
-  uint8_t inbuf[251] = {0};
-  uint8_t lenMSG = sizeof(inbuf);
-  if (rf95.available()) {
-    if(rf95.recv(inbuf, &lenMSG))
-      {
-        Serial.println();
-        Serial.println("Recieved a new message!");
-
-        uint8_t message_buffer[251] = {0};
-        struct packet rec;
-        rec = decode(inbuf, message_buffer);
-        Serial.print("┌From: ");
-        Serial.println(rec.source);
-        Serial.print("├To: ");
-        Serial.println(rec.destination);
-        Serial.print("└Message: ");
-        Serial.println((char*)message_buffer);
-      }
-  }
-  #endif
 }
