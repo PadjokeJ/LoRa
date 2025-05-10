@@ -14,7 +14,7 @@
 
 #define MODEM_CONFIG RH_RF95::Bw31_25Cr48Sf512
 
-#define LORA_STRENGTH 20
+#define LORA_STRENGTH 23
 #define LORA_SS 10
 #define LORA_FREQ 868 //MHz
 
