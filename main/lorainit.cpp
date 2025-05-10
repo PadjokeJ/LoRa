@@ -1,10 +1,11 @@
 #include "lorainit.h"
+#include <RH_RF95.h>
 
 #include "config.h"
 
 
 //-------------------------Constructeur de Lorainit------------------------
-Lorainit::Lorainit(int ssPin, int freq) 
+Lorainit::Lorainit(int ssPin, int freq){
     _ssPin = ssPin;
     _freq = freq;
     _rf95 = new RH_RF95(_ssPin);

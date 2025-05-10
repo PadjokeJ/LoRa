@@ -10,9 +10,20 @@
 #define RFM95_INT     2   // Interrupt pin (DIO0)
 #define RF95_FREQ     868.0 // Frequency (set according to your region)
 
+//#define SENDER
+
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 void setup() {
+  pinMode(RFM95_RST, OUTPUT);
+  digitalWrite(RFM95_RST, HIGH);
+
+  // Manual reset
+  digitalWrite(RFM95_RST, LOW);
+  delay(10);
+  digitalWrite(RFM95_RST, HIGH);
+  delay(10);
+
   Serial.begin(9600);
   while (!Serial);
 
@@ -27,7 +38,8 @@ void setup() {
 }
 
 void loop() {
-  uint8_t outbuf[251];
+  #ifdef SENDER
+  uint8_t outbuf[251] = {0};
   struct packet send = encode_message_to_send((uint8_t) 65, (uint8_t) 0, "Hello world!", outbuf);
 
   for(int i = 0; i < 30; i++){
@@ -39,4 +51,20 @@ void loop() {
   rf95.waitPacketSent();  // Wait until the message is sent
   Serial.println("Message sent!");
   delay(1000);  // Wait 1 second before sending the next message
+  #endif
+
+  #ifndef SENDER
+  uint8_t inbuf[251] = {0};
+  uint8_t lenMSG = sizeof(inbuf);
+  if (rf95.available()) {
+    if(rf95.recv(inbuf, &lenMSG))
+      {
+        for(int i = 0; i < 30; i++){
+          Serial.print(inbuf[i]);
+          Serial.print(", ");
+        }
+        Serial.println();
+      }
+  }
+  #endif
 }
