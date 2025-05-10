@@ -10,7 +10,7 @@
 #define RFM95_INT     2   // Interrupt pin (DIO0)
 #define RF95_FREQ     868.0 // Frequency (set according to your region)
 
-//#define SENDER
+#define SENDER
 
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
@@ -40,7 +40,7 @@ void setup() {
 void loop() {
   #ifdef SENDER
   uint8_t outbuf[251] = {0};
-  struct packet send = encode_message_to_send((uint8_t) 65, (uint8_t) 0, "Hello world!", outbuf);
+  struct packet send = encode_message_to_send((uint8_t) 65, (uint8_t) 69, "Hello world!", outbuf);
 
   for(int i = 0; i < 30; i++){
     Serial.print(outbuf[i]);
