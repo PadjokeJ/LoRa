@@ -10,7 +10,7 @@
 #define RFM95_INT     2   // Interrupt pin (DIO0)
 #define RF95_FREQ     868.0 // Frequency (set according to your region)
 
-#define SENDER
+//define SENDER
 
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
@@ -59,11 +59,17 @@ void loop() {
   if (rf95.available()) {
     if(rf95.recv(inbuf, &lenMSG))
       {
+        Serial.println("Recieved a new message!");
+
         for(int i = 0; i < 30; i++){
           Serial.print(inbuf[i]);
           Serial.print(", ");
         }
         Serial.println();
+
+        uint8_t message_buffer[251] = {0};
+        decode(inbuf, message_buffer);
+        Serial.println((char*)message_buffer);
       }
   }
   #endif
