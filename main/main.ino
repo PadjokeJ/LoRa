@@ -5,6 +5,7 @@
 #include "decode.h"
 #include "encode.h"
 #include "config.h"
+#include "memory.h"
 
 #define RFM95_CS      10  // Chip Select pin
 #define RFM95_RST     9   // Reset pin
@@ -16,25 +17,28 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 int step = STATE_ASK_ADDRESS;
 int dest = 0;
 
+#define SEEN_MESSAGES_ARRAY_SIZE 20
+uint16_t seen_messages[SEEN_MESSAGES_ARRAY_SIZE] = {0};
+
 int to_int(uint8_t* ch){
   int i = 0;
   while(ch[i++]);
 
-  Serial.print("TO_INT: 1 ; ");
-  Serial.println(i);
+  //Serial.print("TO_INT: 1 ; ");
+  //Serial.println(i);
 
   int num = 0;
   i-= 2;
   int max = i;
-  Serial.print("TO_INT: ch ; ");
-  Serial.println(ch[i]);
+  //Serial.print("TO_INT: ch ; ");
+  //Serial.println(ch[i]);
   while(ch[i]){
     if(ch[i] >= 48 && ch[i] <= 57){
       int tmp = 1;
       for(int j = 0; j < max - i; j++)
         tmp *= 10;
-      Serial.print("TO_INT: tmp ; ");
-      Serial.println(tmp);
+      //Serial.print("TO_INT: tmp ; ");
+      //Serial.println(tmp);
       num += tmp * (ch[i] - 48);
     }else{
       return -1;
@@ -64,6 +68,18 @@ void try_recieve(){
           Serial.print("└Message: ");
           Serial.println((char*)message_buffer);
         }
+        else{
+          Serial.println("Message is not for me");
+          if (!comparaison(rec.identifier, seen_messages, SEEN_MESSAGES_ARRAY_SIZE)){
+            // forward message
+            delay(1000); // make sure next lora has enough time to switch back to recieve mode
+            rf95.send(inbuf, strlen(inbuf));  // Send message
+            rf95.waitPacketSent();  // Wait until the message is sent
+            Serial.println("Message forwarded!");
+          }
+          else
+            Serial.println("I have seen and forwarded this in the past!");
+        }
       }
   }
 }
@@ -74,8 +90,8 @@ void get_user_input(int index, uint8_t* msgbuf){
     c = Serial.read();
     try_recieve();
     if (c != -1){
-      Serial.print((int)c);
-      Serial.print(", ");
+      //Serial.print((int)c);
+      //Serial.print(", ");
 
       if (c >= 32)
         msgbuf[index++] = c;
@@ -161,10 +177,10 @@ void loop() {
       Serial.println((char*)msgbuf);
       struct packet send = encode_message_to_send(MY_ADDRESS, (uint8_t) dest, msgbuf, outbuf);
 
-      for(int i = 0; i < 30; i++){
-        Serial.print(outbuf[i]);
-        Serial.print(", ");
-      }
+      //for(int i = 0; i < 30; i++){
+      //  Serial.print(outbuf[i]);
+      //  Serial.print(", ");
+      //}
 
       rf95.send(outbuf, strlen(outbuf));  // Send message
       rf95.waitPacketSent();  // Wait until the message is sent

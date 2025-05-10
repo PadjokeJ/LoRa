@@ -2,9 +2,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
-int comparaison(uint8_t id, uint8_t* knownlist, int taille) {  // Déclare la fonction 'comparaison' qui prend l'ID du paquet, un tableau d'IDs et la taille du tableau.
+int comparaison(uint16_t id, uint16_t* knownlist, int taille) {  // Déclare la fonction 'comparaison' qui prend l'ID du paquet, un tableau d'IDs et la taille du tableau.
     int known = 0;  // Déclare et initialise la variable 'known' à 0, qui indiquera si l'ID a été trouvé dans le tableau.
-    uint8_t *tmp; // Initialisation d'um pointeur tmp
+    uint16_t *tmp; // Initialisation d'um pointeur tmp
     int verif; // Initialisation d'une variable verif 
     for (int i = 0; knownlist[i] != 0; i++) {  // Parcourt le tableau d'IDs jusqu'à ce qu'il n'y ait plus d'ID dans la liste
         if (knownlist[i] == id) {  // Si l'élément actuel du tableau correspond à l'ID cherché.

@@ -31,7 +31,7 @@ struct packet decode(uint8_t* packet_bytes, char* message_buffer){
     char* decoded_bytes_array_address = ptr_decoded_bytes; // cpoy the adresse of the begining of the array
 
     int i = 0;
-    while(*ptr_packet_bytes && i <= message_size){ // loop until it is at the end of the array
+    while(*ptr_packet_bytes && i <= 245){ // loop until it is at the end of the array
         *ptr_decoded_bytes = (char)*ptr_packet_bytes; // take the encoded byte and turn it into a character
         message_buffer[i] = (char)*ptr_packet_bytes; // take the encoded byte and turn it into a character
         ptr_decoded_bytes++; // go to the next byte to write to
