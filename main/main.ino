@@ -49,20 +49,21 @@ void try_recieve(){
   uint8_t inbuf[251] = {0};
   uint8_t lenMSG = sizeof(inbuf);
   if (rf95.available()) {
-    if(rf95.recv(inbuf, &lenMSG))
-      {
+    if(rf95.recv(inbuf, &lenMSG)){
         Serial.println();
         Serial.println("Recieved a new message!");
 
         uint8_t message_buffer[251] = {0};
         struct packet rec;
         rec = decode(inbuf, message_buffer);
-        Serial.print("┌From: ");
-        Serial.println(rec.source);
-        Serial.print("├To: ");
-        Serial.println(rec.destination);
-        Serial.print("└Message: ");
-        Serial.println((char*)message_buffer);
+        if(rec.destination == MY_ADDRESS){
+          Serial.print("┌From: ");
+          Serial.println(rec.source);
+          Serial.print("├To: ");
+          Serial.println(rec.destination);
+          Serial.print("└Message: ");
+          Serial.println((char*)message_buffer);
+        }
       }
   }
 }
@@ -107,6 +108,12 @@ void setup() {
   }
   Serial.println();
   Serial.println("LoRa initialized successfully!");
+  Serial.println();
+
+  Serial.print("LoRa is situated on network at address ");
+  Serial.println(MY_ADDRESS);
+  Serial.println();
+
 
   rf95.setFrequency(RF95_FREQ);  // Set frequency
   rf95.setTxPower(23, false);  // Set transmit power
@@ -152,7 +159,7 @@ void loop() {
     if (msgbuf[0] >= 32){
       Serial.println();
       Serial.println((char*)msgbuf);
-      struct packet send = encode_message_to_send((uint8_t) 65, (uint8_t) dest, msgbuf, outbuf);
+      struct packet send = encode_message_to_send(MY_ADDRESS, (uint8_t) dest, msgbuf, outbuf);
 
       for(int i = 0; i < 30; i++){
         Serial.print(outbuf[i]);

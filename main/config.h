@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <RH_RF95.h>
 
+#define MY_ADDRESS (uint8_t)5
+
 #define LISTEN_TIME 10 //in seconds
 
 #define RFM95_CS   10
