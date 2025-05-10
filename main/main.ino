@@ -3,11 +3,8 @@
 
 #include "packet.h"
 #include "decode.h"
-#include "lorainit.h"
-#include "send.h"
-#include "receive.h"
+
 #include "encode.h"
-#include "memory.h"
 
 #define RFM95_CS      10  // Chip Select pin
 #define RFM95_RST     9   // Reset pin
@@ -16,15 +13,29 @@
 
 //#define SENDER
 
-Lorainit lora = Lorainit(RFM95_CS, RF95_FREQ, RFM95_INT);
-Send sender = Send(lora);
-Receive receiver = Receive(lora);
-
-uint16_t* seen_message_IDs[10];
+RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 void setup() {
-  lora.init();
-  //while (!Serial);
+  pinMode(RFM95_RST, OUTPUT);
+  digitalWrite(RFM95_RST, HIGH);
+
+  // Manual reset
+  digitalWrite(RFM95_RST, LOW);
+  delay(10);
+  digitalWrite(RFM95_RST, HIGH);
+  delay(10);
+
+  Serial.begin(9600);
+  while (!Serial);
+
+  if (!rf95.init()) {
+    Serial.println("LoRa initialization failed!");
+    while (1);
+  }
+  Serial.println("LoRa initialized successfully!");
+
+  rf95.setFrequency(RF95_FREQ);  // Set frequency
+  rf95.setTxPower(23, false);  // Set transmit power
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
@@ -33,11 +44,9 @@ void setup() {
 }
 
 void loop() {
-  uint8_t outbuf[251] = {0};
-  uint8_t message_buf[245]  = {0};
-  uint8_t mLen;
-
   #ifdef SENDER
+  uint8_t outbuf[251] = {0};
+
   struct packet send = encode_message_to_send((uint8_t) 65, (uint8_t) 0, "Hello world!", outbuf);
 
   Serial.println();
@@ -48,11 +57,20 @@ void loop() {
   Serial.println("Message sent!");
   delay(1000);  // Wait 1 second before sending the next message
   #endif
+
+
   #ifndef SENDER
-  if(receiver.receiveMessage(outbuf, mLen) == RECIEVE_ERROR_SUCCESS){
-    struct packet decoded_message = decode(outbuf, message_buf);
-    Serial.print("Message: ");
-    Serial.println((char *)message_buf);
+  uint8_t inbuf[251] = {0};
+  uint8_t lenMSG = sizeof(inbuf);
+  if (rf95.available()) {
+    if(rf95.recv(inbuf, &lenMSG))
+      {
+        for(int i = 0; i < 30; i++){
+          Serial.print(inbuf[i]);
+          Serial.print(", ");
+        }
+        Serial.println();
+      }
   }
   #endif
 }
