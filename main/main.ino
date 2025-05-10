@@ -4,16 +4,46 @@
 #include "packet.h"
 #include "decode.h"
 #include "encode.h"
+#include "config.h"
 
 #define RFM95_CS      10  // Chip Select pin
 #define RFM95_RST     9   // Reset pin
 #define RFM95_INT     2   // Interrupt pin (DIO0)
 #define RF95_FREQ     868.0 // Frequency (set according to your region)
 
-#define SENDER
 
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
+int step = STATE_ASK_ADDRESS;
+int dest = 0;
 
+int to_int(uint8_t* ch){
+  int i = 0;
+  while(ch[i++]);
+
+  Serial.print("TO_INT: 1 ; ");
+  Serial.println(i);
+
+  int num = 0;
+  i-= 2;
+  int max = i;
+  Serial.print("TO_INT: ch ; ");
+  Serial.println(ch[i]);
+  while(ch[i]){
+    if(ch[i] >= 48 && ch[i] <= 57){
+      int tmp = 1;
+      for(int j = 0; j < max - i; j++)
+        tmp *= 10;
+      Serial.print("TO_INT: tmp ; ");
+      Serial.println(tmp);
+      num += tmp * (ch[i] - 48);
+    }else{
+      return -1;
+    }
+    i--;
+  }
+  if (num > 255) return -1;
+  return num;
+}
 
 void try_recieve(){
   uint8_t inbuf[251] = {0};
@@ -34,6 +64,27 @@ void try_recieve(){
         Serial.print("└Message: ");
         Serial.println((char*)message_buffer);
       }
+  }
+}
+
+void get_user_input(int index, uint8_t* msgbuf){
+  char c = 0;
+  while(1){
+    c = Serial.read();
+    try_recieve();
+    if (c != -1){
+      Serial.print((int)c);
+      Serial.print(", ");
+
+      if (c >= 32)
+        msgbuf[index++] = c;
+
+      if (c == 10)
+      {
+        msgbuf[index++] = 0;
+        break;
+      }
+    }
   }
 }
 
@@ -63,41 +114,57 @@ void setup() {
 
 void loop() {
   uint8_t msgbuf[245] = {0};
-  
-  char c = 0;
+
+  if(step == STATE_ASK_ADDRESS)
+  {
+    Serial.println("Please input message destination address");
+    step++;
+  }
+  if(step == STATE_ASK_MESSAGE)
+  {
+    Serial.println("Please input message");
+    step++;
+  }
+
   int index = 0;
-  while(1){
-    c = Serial.read();
-    try_recieve();
-    if (c != -1){
-      Serial.print((int)c);
-      Serial.print(", ");
 
-      if (c >= 32)
-        msgbuf[index++] = c;
+  get_user_input(index, msgbuf);
 
-      if (c == 10)
-      {
-        msgbuf[index++] = 0;
-        break;
-      }
+  
+  if (step == STATE_INPUT_ADDRE){
+    dest = to_int(msgbuf);
+    if (dest == -1)
+    {
+      step = 0;
+      Serial.println(" /!\\ Invalid address /!\\ ");
+    }
+    if(dest >= 0)
+    {
+      Serial.print("Set address -> ");
+      Serial.println(dest);
+      step++;
     }
   }
+
   uint8_t outbuf[251] = {0};
   
-  if (msgbuf[0] >= 32){
-    Serial.println();
-    Serial.println((char*)msgbuf);
-    struct packet send = encode_message_to_send((uint8_t) 65, (uint8_t) 69, msgbuf, outbuf);
+  if(step == STATE_INPUT_MESSA){
+    if (msgbuf[0] >= 32){
+      Serial.println();
+      Serial.println((char*)msgbuf);
+      struct packet send = encode_message_to_send((uint8_t) 65, (uint8_t) dest, msgbuf, outbuf);
 
-    for(int i = 0; i < 30; i++){
-      Serial.print(outbuf[i]);
-      Serial.print(", ");
+      for(int i = 0; i < 30; i++){
+        Serial.print(outbuf[i]);
+        Serial.print(", ");
+      }
+
+      rf95.send(outbuf, strlen(outbuf));  // Send message
+      rf95.waitPacketSent();  // Wait until the message is sent
+      Serial.println("Message sent!");
+      delay(1000);  // Wait 1 second before sending the next message
+
+      step = 0;
     }
-
-    rf95.send(outbuf, strlen(outbuf));  // Send message
-    rf95.waitPacketSent();  // Wait until the message is sent
-    Serial.println("Message sent!");
-    delay(1000);  // Wait 1 second before sending the next message
   }
 }
