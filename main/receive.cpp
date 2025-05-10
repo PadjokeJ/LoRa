@@ -13,15 +13,6 @@ void Receive::startReceive() {
 }
 
 uint8_t Receive::receiveMessage(uint8_t* msg_buffer, uint8_t max_len) {
-    //Serial.println("BUFFER BEFORE");
-    //Serial.println();
-    //for(int i = 0; i < 30; i++)
-    //{
-    //    Serial.print(msg_buffer[i]);
-    //    Serial.print(" ");
-    //}
-    //Serial.println();
-    //Serial.println("Buffer After");
     if (!lora.lora().available()) {  // Check if a packet is received
         return RECIEVE_ERROR_NO_MESSAGE;
     }

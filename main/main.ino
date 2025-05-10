@@ -3,6 +3,7 @@
 
 #include "packet.h"
 #include "decode.h"
+
 #include "encode.h"
 
 #define RFM95_CS      10  // Chip Select pin
@@ -35,23 +36,28 @@ void setup() {
 
   rf95.setFrequency(RF95_FREQ);  // Set frequency
   rf95.setTxPower(23, false);  // Set transmit power
+
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(2000);
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop() {
   #ifdef SENDER
   uint8_t outbuf[251] = {0};
+
   struct packet send = encode_message_to_send((uint8_t) 65, (uint8_t) 0, "Hello world!", outbuf);
 
-  for(int i = 0; i < 30; i++){
-    Serial.print(outbuf[i]);
-    Serial.print(", ");
-  }
+  Serial.println();
 
-  rf95.send(outbuf, strlen(outbuf));  // Send message
-  rf95.waitPacketSent();  // Wait until the message is sent
+  digitalWrite(LED_BUILTIN, HIGH);
+  sender.sendPackets(outbuf);  // Send message
+  digitalWrite(LED_BUILTIN, LOW);
   Serial.println("Message sent!");
   delay(1000);  // Wait 1 second before sending the next message
   #endif
+
 
   #ifndef SENDER
   uint8_t inbuf[251] = {0};
