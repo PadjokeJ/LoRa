@@ -56,4 +56,4 @@ Was asked to make a process response, ended up coding queue system that would cr
 
 - [x] [Memory](/main/memory.cpp)
 - [x] [Memory header](/main/memory.h)
-- [x] [Memory test](/main/test/memory_test.cpp)
+- [ ] [Memory test](/main/test/memory_test.cpp)
