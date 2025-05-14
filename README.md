@@ -2,6 +2,10 @@
 
 Projet de fin d'année, à deux  
 
+# Evaluation  
+
+[Fichier contennant la répartition de ce qui a été fait](/EVALUATION.md)  
+
 ## Plan  
 
 Ordre des choses
