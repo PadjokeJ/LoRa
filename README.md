@@ -21,13 +21,13 @@ Ordre des choses
 
 - [x] code
 - [x] documentation
-- [ ] tester
+- [x] tester
 
 ### Phase 3 - Réalisation 2  
 
-- [ ] mettre ensemble
-- [ ] tester
-- [ ] corriger
+- [x] mettre ensemble
+- [x] tester
+- [x] corriger
 
 ### Phase 4 - Déploiement
 
