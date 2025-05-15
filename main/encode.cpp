@@ -29,16 +29,16 @@ struct packet encode(uint8_t packet_type, uint16_t identifier, uint8_t source_ad
 
     int i = 6;
     while(*ptr_message){
-        buffer[i] = (uint8_t)*ptr_message;// transform char to 8bit
-        ptr_message++;
-        i++;
+        buffer[i] = (uint8_t)*ptr_message;// transform char to 8bit and put it into the message buffer
+        ptr_message++; // increment message pointer, to get to the next char
+        i++; // move to next position in message buffer
     }
-    buffer[i] = 0;
+    buffer[i] = 0; // set the last char of message to string end character
 
 
     encoding_packet.encoded_bytes = buffer; //set the message bytes inside of the packet structure
 
-    return encoding_packet;
+    return encoding_packet; // return the packet we encoded to
 }
 
 struct packet encode_message_reciept(struct packet recieved_packet, uint8_t* buffer){
@@ -53,10 +53,10 @@ struct packet encode_message_reciept(struct packet recieved_packet, uint8_t* buf
 }
 
 struct packet encode_message_to_send(uint8_t source, uint8_t dest, char* message, uint8_t* buffer){
-    randomSeed(analogRead(0)); // set the seed of the random number generator
-    int random_number = random(65535); // get a random number
+    randomSeed(analogRead(0)); // set the seed of the random number generator --> get "noise" from unused arduino port (static electricity)
+    int random_number = random(65535); // get a random number, using the arduino's "random seed" from electrical noise
 
-    uint16_t identifier = (uint16_t)random_number; //convert the random number to a 16 bit type
+    uint16_t identifier = (uint16_t)random_number; //convert the random number int to a 16 bit type
 
     return encode(1, identifier, source, dest, message, buffer); // return a packet for this type (message)
 }
