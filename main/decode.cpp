@@ -1,3 +1,10 @@
+/**
+ * Code to decode uint8_t bytes into a char string
+ * Gets packet's relevant information, such as packet id, packet dest and packet source
+ *
+ * Code redacted by padjokej.dev, commented by arthur.delemont
+**/
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
