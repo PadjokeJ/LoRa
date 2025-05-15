@@ -1,3 +1,9 @@
+/**
+ * Code to encode strings into uint8_t buffers, alongside useful information
+ *
+ * Code redacted by padjokej.dev, commented by arthur.delemont
+**/
+
 #include <time.h>
 #include <stdlib.h>
 #include <Arduino.h>
