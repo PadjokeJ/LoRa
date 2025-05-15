@@ -1,3 +1,9 @@
+/*
+Memory code to store messages id's and prevent infinite loops
+Made by Maurits van der Net and Agnès Briens
+
+*/
+
 #include "memory.h"
 #include <stdint.h>
 #include <stdio.h>
