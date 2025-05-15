@@ -17,6 +17,7 @@ struct packet to_packet_struct(uint8_t packet_type, uint16_t identifier, uint8_t
 struct packet create_recieve_packet(uint16_t original_identifier, uint8_t original_source, uint8_t original_dest){ // unused function --> delete later
     struct packet packet_to_return;
 
+    /* UNUSED
     packet_to_return.type = ~1;
     packet_to_return.identifier = original_identifier;
 
@@ -24,6 +25,7 @@ struct packet create_recieve_packet(uint16_t original_identifier, uint8_t origin
     packet_to_return.destination = original_source;
 
     packet_to_return.message = "\0";
+    */
 
     return packet_to_return;
 }

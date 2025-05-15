@@ -33,6 +33,8 @@ struct packet decode(uint8_t* packet_bytes, char* message_buffer){
     return decoding_packet;
 }
 
+
+/* UNUSED FUNCTION - could be used for debugging, but doesn't use serial...*/
 int get_packet_type(struct packet pack){
     uint8_t packet_type = pack.type; // get the packet type from the packet structure
     
