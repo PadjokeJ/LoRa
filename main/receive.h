@@ -7,7 +7,7 @@
 // Cette lib… c’est genre la baguette magique pour parler à ton module LoRa intersidéral
 #include <RH_RF95.h>
 
-// On invoque ici l’initiateur, le **LoraInit**, genre le druide qui configure ton cristal de communication
+// On invoque ici l’initiateur, le LoraInit, genre le druide qui configure ton cristal de communication
 #include "lorainit.h"
 
 // Des constantes planquées dans une grotte appelée config.h. Attention, ça peut contenir des vérités absolues.

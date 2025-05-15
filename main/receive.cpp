@@ -1,61 +1,56 @@
 #include "receive.h"
+#include <stdint.h>  // Les entiers sont les pièces d’or de notre royaume de bits.
 
-// Inclusion de la bibliothèque standard des types d'entiers, pour une gestion rigoureuse de la mémoire.
-#include <stdint.h>
+#include "config.h"  // Les édits royaux, définis par l’oracle du compilateur.
 
-// Inclusion des constantes, vraisemblablement des codes d’erreur et paramètres définis en amont.
-#include "config.h"
-
-// Le constructeur de la classe Receive : il reçoit en legs une référence à un module LoRa déjà prêt à servir.
+// L’instant de la naissance : Receive voit le jour dans une explosion de paillettes numériques.
 Receive::Receive(Lorainit &loraModule) : lora(loraModule) {}
 
 void Receive::startReceive() {
-    // Annonce solennelle de la mise en place du mode réception.
+    //  L’annonce au royaume : "Le module entre en état de réceptivité sacrée"
     Serial.println("Setting receive mode...");
 
-    // Ordre donné au module LoRa de passer à l’état d’écoute, noble posture pour tout récepteur.
+    //  Le cristal LoRa est orienté vers les étoiles, prêt à écouter les esprits du sans-fil.
     lora.lora().setModeRx();
 
-    // Confirmation à l’utilisateur : le dispositif est désormais en état de recevoir.
+    // Tout est silence et attention. Le module médite, prêt à accueillir.
     Serial.println("LoRa module is in receive mode.");
 }
 
 uint8_t Receive::receiveMessage(uint8_t* msg_buffer, uint8_t max_len) {
-    // Vérification préliminaire : y a-t-il un message à recevoir en ces lieux ?
+    //  Est-ce que des murmures invisibles flottent dans l’air ?
     if (!lora.lora().available()) {
-        // Point de message, point de réception.
-        return RECIEVE_ERROR_NO_MESSAGE;
+        return RECIEVE_ERROR_NO_MESSAGE;  // Rien n’est descendu des cieux aujourd’hui.
     }
 
     uint8_t len = max_len;
-    uint8_t buffer[250]; // Tampon inutile dans le cas présent, mais laissé là par prudence ou oubli.
+    uint8_t buffer[250]; // Un espace oublié, qui respire doucement... on ne sait jamais.
 
-    // Tentative de réception : le module se voit confier la noble tâche de remplir le tampon fourni.
+    //  Tentative de captation : allons, messager céleste, viens dans notre RAM.
     if (!lora.lora().recv(msg_buffer, &len)) {
-        // Hélas ! la réception a échoué.
-        Serial.println("Receive failed.");
+        Serial.println("Receive failed.");  // Le message s’est perdu dans l’au-delà.
         return RECIEVE_ERROR_FAILED;
     }
 
-    // Séquence de débogage : inspection des octets reçus.
+    //  Début de la cérémonie du débogage sacré.
     Serial.println();
     Serial.println("Buffer After");
 
     for (int i = 0; i < 30; i++) {
-        Serial.print(msg_buffer[i]);
+        Serial.print(msg_buffer[i]);  // Chaque octet est un pétale de lotus quantique.
         Serial.print(" ");
     }
     Serial.println();
 
-    // Annonce du message reçu, pour la plus grande joie du programmeur.
+    //  La déclaration : voilà ce que les cieux ont murmuré !
     Serial.print("Received message: ");
     Serial.write(msg_buffer, len);
     Serial.println();
 
-    // Indication de la puissance du signal, reflet de la qualité de la transmission.
+    // Et maintenant, la force du signal, comme une mesure de foi.
     Serial.print("RSSI: ");
     Serial.println(lora.lora().lastRssi());
 
-    // Tout s’est déroulé avec succès.
+    // Tout est aligné. Les planètes, les bits, le ROI.
     return RECIEVE_ERROR_SUCCESS;
 }
