@@ -1,3 +1,9 @@
+/**
+ * Code for packet structs to facilitate data management in main loop
+ *
+ * Code redacted and commented by padjokej.dev
+**/
+
 #include <stdint.h>
 #include "packet.h"
 
