@@ -1,3 +1,10 @@
+/**
+ * Main code to send and receive messages with Dragino-dev lorawan devices
+ * Works in a network
+ *
+ * Code mostly redacted by padjokej.dev
+**/
+
 #include <SPI.h>
 #include <RH_RF95.h>
 
